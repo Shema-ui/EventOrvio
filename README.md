@@ -4,12 +4,11 @@ Registration system for the **Rwanda Tourism Forum & Awards 2026** (Rwanda Chamb
 
 | Page | Path |
 |---|---|
-| Event hub | `/rtfa2026/` |
 | Link A · Pre-Forum Training (26 Nov, online) | `/rtfa2026/training/` |
 | Link B · Main Forum (27 Nov, Kigali) | `/rtfa2026/forum/` |
 | Admin dashboard | `/rtfa2026/admin/` |
 
-Static site on GitHub Pages; data stored in a Google Sheet through a Google Apps Script web app (`apps-script/Code.gs`).
+Only the registration forms and the dashboard are hosted here (RCOT links to the forms from its own website). Static site on GitHub Pages; data stored in a Google Sheet through a Google Apps Script web app (`apps-script/Code.gs`).
 
 While `API_URL` in `assets/js/config.js` is empty, the site runs in **preview mode**: registrations are kept in the visitor's own browser, and the dashboard accepts any key.
 

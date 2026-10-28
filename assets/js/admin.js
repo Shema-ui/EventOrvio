@@ -103,7 +103,8 @@
     app.innerHTML =
       '<div class="shell"><aside class="side" id="side"><a class="brand" href="#/forum/dashboard">' + ic("leaf") + "<span>Rwanda<br>Tourism<br>Forum</span></a>" +
       '<nav class="nav" aria-label="Admin">' + nav + "</nav>" +
-      '<div class="side-foot"><a href="../" target="_blank" rel="noopener">' + ic("link") + "Registration pages</a>" +
+      '<div class="side-foot"><a href="../training/" target="_blank" rel="noopener">' + ic("link") + "Training form</a>" +
+      '<a href="../forum/" target="_blank" rel="noopener">' + ic("link") + "Forum form</a>" +
       '<button type="button" id="signout">' + ic("out") + "Sign out</button></div></aside>" +
       '<main class="main" id="main"><button class="menu-btn" id="menu" aria-expanded="false" aria-controls="side">' + ic("menu") + "Menu</button><div id='view'></div></main></div>" +
       '<div class="drawer" id="drawer" hidden><div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="dr-title" id="drawer-panel"></div></div>';

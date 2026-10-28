@@ -41,51 +41,15 @@ def page(path, title, desc, body, depth, extra_head="", scripts=""):
 
 
 def topbar(up, current=""):
-    links = [("Event", up + "rtfa2026/", "hub"), ("Pre-Forum Training", up + "rtfa2026/training/", "training"), ("Main Forum", up + "rtfa2026/forum/", "forum")]
-    nav = "".join(f'<a href="{h}"{" aria-current=\"page\"" if k == current else ""}>{t}</a>' for t, h, k in links)
-    return f"""<header class="topbar"><div class="wrap topbar-inner">
-<a class="host" href="{up}rtfa2026/"><span class="host-mark"><span>RCOT</span></span><span class="host-name">Rwanda Chamber of Tourism<small>Rwanda Tourism Forum &amp; Awards 2026</small></span></a>
-<nav class="top-links" aria-label="Event">{nav}</nav></div></header>"""
+    return """<header class="topbar"><div class="wrap topbar-inner">
+<span class="host"><span class="host-mark"><span>RCOT</span></span><span class="host-name">Rwanda Chamber of Tourism<small>Rwanda Tourism Forum &amp; Awards 2026</small></span></span>
+</div></header>"""
 
 
 def footer(up):
     return f"""<footer class="foot"><div class="wrap foot-inner">
 <span>Rwanda Tourism Forum &amp; Awards 2026 · Organised with Global Planners Ltd</span>
-<span class="powered">Registration by <a href="{up}"><strong>Orvio Systems</strong></a></span></div></footer>"""
-
-
-# ---------- Event hub ----------
-hub = f"""{topbar('../', 'hub')}
-<main>
-<section class="hero"><div class="wrap hero-inner">
-<p class="eyebrow">Rwanda Chamber of Tourism presents</p>
-<h1>Rwanda Tourism Forum &amp; Awards 2026</h1>
-<p class="lead">Two days that bring Rwanda's tourism sector together: a practical AI marketing training on 26 November, followed by the Forum and Awards in Kigali on 27 November.</p>
-<div class="facts"><span class="fact">{ICON['cal']}26–27 November 2026</span><span class="fact">{ICON['pin']}Kigali, Rwanda</span><span class="fact">{ICON['users']}Around 400 participants</span></div>
-</div>{HILLS}</section>
-<section class="wrap hub">
-<div class="hub-grid">
-<article class="session-card is-training">
-<span class="tag">Pre-Forum Training · Online</span>
-<h2>Practical AI for Marketing</h2>
-<div class="meta"><span>Thu 26 Nov 2026</span><span>Online · 1–2 hours</span><span>by Google Hustle Academy</span></div>
-<p>Hands-on training on using AI tools to plan, create and measure tourism marketing. Participants receive a certificate of participation.</p>
-<a class="btn btn-primary" href="training/">Register for the training</a>
-</article>
-<article class="session-card">
-<span class="tag">Main Forum · In person</span>
-<h2>Rwanda Tourism Forum &amp; Awards</h2>
-<div class="meta"><span>Fri 27 Nov 2026</span><span>Kigali</span><span>~400 delegates</span></div>
-<p>The sector's flagship gathering: industry dialogue, partnerships and the Rwanda Tourism Awards, with leaders, operators and partners from across tourism.</p>
-<a class="btn btn-primary" href="forum/">Register for the Forum</a>
-</article>
-</div>
-<p class="admin-note small">Organisers: <a href="admin/">open the registration dashboard</a></p>
-</section>
-</main>
-{footer('../')}"""
-page("rtfa2026/index.html", "Rwanda Tourism Forum & Awards 2026 · Registration", "Register for the Rwanda Tourism Forum & Awards 2026 and the Pre-Forum AI for Marketing training.", hub, 1,
-     '<link rel="stylesheet" href="../assets/css/event.css">')
+<span class="powered">Registration by <strong>Orvio Systems</strong></span></div></footer>"""
 
 
 # ---------- Registration pages ----------
@@ -150,10 +114,6 @@ landing = """<header class="topbar"><div class="wrap topbar-inner"><a class="hos
 <p class="lead">Online registration, delegate management, dashboards and custom business systems, designed and delivered in Rwanda.</p>
 <div class="facts"><span class="fact">Event registration</span><span class="fact">Live dashboards</span><span class="fact">Custom business systems</span></div>
 </div>""" + HILLS + """</section>
-<section class="wrap hub"><div class="hub-grid">
-<article class="session-card"><span class="tag">Live now</span><h2>Rwanda Tourism Forum &amp; Awards 2026</h2><div class="meta"><span>26–27 Nov 2026</span><span>Kigali</span></div><p>Registration for the Pre-Forum AI for Marketing training and the Main Forum.</p><a class="btn btn-primary" href="rtfa2026/">Go to registration</a></article>
-<article class="session-card is-training"><span class="tag">For organisers</span><h2>Need a registration system?</h2><div class="meta"><span>Branded forms</span><span>Confirmation emails</span><span>Excel exports</span></div><p>Branded registration pages, automatic confirmations and a real-time admin dashboard, ready in days.</p><a class="btn btn-ghost" href="rtfa2026/">See a live example</a></article>
-</div></section>
 </main>
 <footer class="foot"><div class="wrap foot-inner"><span>© 2026 Orvio Systems</span><span>orviosystems.si</span></div></footer>"""
 page("index.html", "Orvio Systems · Event registration & business systems", "Orvio Systems builds event registration platforms, dashboards and business systems.", landing, 0,

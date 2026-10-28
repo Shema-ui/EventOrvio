@@ -188,7 +188,7 @@
       '<p class="ref">Reference <strong>' + esc(res.ref) + "</strong></p>" +
       '<dl class="summary">' + rows.map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1] || "–") + "</dd></div>"; }).join("") + "</dl>" +
       "<p class=\"small\">" + (PREVIEW ? "Preview mode: in the live system a confirmation email is sent to " + esc(data.email) + "." : "A confirmation email has been sent to " + esc(data.email) + ". Check your spam folder if it doesn't arrive within a few minutes.") + "</p>" +
-      '<div class="success-actions"><a class="btn btn-primary" href="' + ics() + '" download="' + eventKey + '-' + CFG.event.code + '.ics">Add to calendar</a><a class="btn btn-ghost" href="./">Register someone else</a><a class="btn btn-ghost" href="../">Back to event</a></div>' +
+      '<div class="success-actions"><a class="btn btn-primary" href="' + ics() + '" download="' + eventKey + '-' + CFG.event.code + '.ics">Add to calendar</a><a class="btn btn-ghost" href="./">Register someone else</a></div>' +
       "</div>";
     var s = card.querySelector(".success"); s.focus(); card.scrollIntoView({ behavior: "smooth", block: "start" });
   }
