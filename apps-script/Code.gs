@@ -30,17 +30,17 @@ const EVENTS = {
   training: {
     sheet: 'Pre-Forum Training',
     prefix: 'TRN',
-    title: 'Practical AI for Marketing',
-    subtitle: 'Pre-Forum Training by Google Hustle Academy',
-    date: 'Thursday, 26 November 2026',
+    title: 'Hustle Academy Training on Practical AI for Marketing',
+    subtitle: 'Rwanda Tourism Forum & Awards 2026',
+    date: '26th Nov 2026',
     where: 'Online (1–2 hours)',
   },
   forum: {
     sheet: 'Main Forum',
     prefix: 'RTF',
-    title: 'Rwanda Tourism Forum & Awards 2026',
-    subtitle: 'Main Forum',
-    date: 'Friday, 27 November 2026',
+    title: 'Rwanda Tourism Forum, Gala Dinner & Awards',
+    subtitle: 'Rwanda Tourism Forum & Awards 2026',
+    date: '27th Nov 2026',
     where: 'Kigali, Rwanda',
   },
 };

@@ -81,13 +81,13 @@ def reg_page(key, kicker, title, lead, facts):
     page(f"rtfa2026/{key}/index.html", f"{title} · Registration", lead, body, 2, f'<link rel="stylesheet" href="{up}assets/css/event.css">', scripts)
 
 
-reg_page("training", "Pre-Forum Training · Google Hustle Academy", "Practical AI for Marketing",
-         "Pre-Forum Training: Practical AI for Marketing, by Google Hustle Academy. Thursday 26 November 2026, online.",
-         [("cal", "Thursday, 26 November 2026"), ("screen", "Online · 1–2 hours")])
+reg_page("training", "Rwanda Tourism Forum &amp; Awards 2026", "Hustle Academy Training on Practical AI for Marketing",
+         "Hustle Academy Training on Practical AI for Marketing, 26th Nov 2026, online.",
+         [("cal", "26th Nov 2026"), ("screen", "Online · 1–2 hours")])
 
-reg_page("forum", "Main Forum · Rwanda Chamber of Tourism", "Rwanda Tourism Forum &amp; Awards 2026",
-         "Main Forum registration. Friday 27 November 2026, Kigali.",
-         [("cal", "Friday, 27 November 2026"), ("pin", "Kigali, Rwanda")])
+reg_page("forum", "Rwanda Tourism Forum &amp; Awards 2026", "Rwanda Tourism Forum, Gala Dinner &amp; Awards",
+         "Rwanda Tourism Forum, Gala Dinner & Awards, 27th Nov 2026, Kigali.",
+         [("cal", "27th Nov 2026"), ("pin", "Kigali, Rwanda")])
 
 
 # ---------- Admin ----------
