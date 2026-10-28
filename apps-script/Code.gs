@@ -38,8 +38,8 @@ const EVENTS = {
   forum: {
     sheet: 'Main Forum',
     prefix: 'RTF',
-    title: 'Rwanda Tourism Forum, Gala Dinner & Awards',
-    subtitle: 'Rwanda Tourism Forum & Awards 2026',
+    title: 'Rwanda Tourism Forum & Awards 2026',
+    subtitle: '',
     date: '27th Nov 2026',
     where: 'Kigali, Rwanda',
   },
@@ -282,7 +282,7 @@ function sendConfirmation(eventKey, ev, d, ref, updated) {
     '<div style="background:#0d5b45;padding:24px 28px;color:#ffffff">' +
     '<div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#e0a823;font-weight:bold">' + esc(HOST_NAME) + '</div>' +
     '<div style="font-size:22px;font-weight:bold;margin-top:6px">' + esc(ev.title) + '</div>' +
-    '<div style="font-size:14px;opacity:.85;margin-top:4px">' + esc(ev.subtitle) + '</div></div>' +
+    (ev.subtitle ? '<div style="font-size:14px;opacity:.85;margin-top:4px">' + esc(ev.subtitle) + '</div>' : '') + '</div>' +
     '<div style="height:6px;background:#e0a823"></div>' +
     '<div style="padding:26px 28px;color:#3a4742;font-size:15px;line-height:1.6">' +
     '<p style="margin:0 0 14px">Dear ' + esc(first) + ',</p>' +

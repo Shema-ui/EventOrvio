@@ -172,3 +172,14 @@ p { margin: 0 0 1em; }
   .summary div { grid-template-columns: 1fr; gap: 0; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+
+/* Registration pages: one centred column, header and form share the same width */
+body.reg .wrap { width: min(860px, 100% - 32px); }
+body.reg .topbar-inner { justify-content: center; }
+body.reg .hero-inner { text-align: center; }
+body.reg .hero h1 { max-width: 20ch; margin-inline: auto; text-wrap: balance; }
+body.reg .eyebrow { justify-content: center; }
+body.reg .eyebrow::after { content: ""; width: 22px; height: 2px; background: currentColor; }
+body.reg .facts { justify-content: center; }
+body.reg .reg-layout { max-width: none; }
+@media (max-width: 600px) { body.reg .eyebrow::before, body.reg .eyebrow::after { display: none; } body.reg .hero-inner { padding-bottom: 84px; } }

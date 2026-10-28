@@ -13,7 +13,7 @@ ICON = {
 HILLS = '<svg class="hills" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path fill="#f6f4ee" d="M0 70V38c120-22 240-30 360-14s240 30 360 10 240-38 360-30 240 26 360 20v46z"/></svg>'
 
 
-def page(path, title, desc, body, depth, extra_head="", scripts=""):
+def page(path, title, desc, body, depth, extra_head="", scripts="", body_class=""):
     up = "../" * depth
     doc = f"""<!DOCTYPE html>
 <html lang="en">
@@ -29,7 +29,7 @@ def page(path, title, desc, body, depth, extra_head="", scripts=""):
 {FONTS}
 {extra_head}
 </head>
-<body>
+<body{f' class="{body_class}"' if body_class else ""}>
 {body}
 {scripts}
 </body>
@@ -59,7 +59,7 @@ def reg_page(key, kicker, title, lead, facts):
     body = f"""{topbar(up, key)}
 <main>
 <section class="hero"><div class="wrap hero-inner">
-<p class="eyebrow">{kicker}</p>
+{f'<p class="eyebrow">{kicker}</p>' if kicker else ""}
 <h1>{title}</h1>
 <div class="facts">{facts_html}</div>
 </div>{HILLS}</section>
@@ -78,15 +78,15 @@ def reg_page(key, kicker, title, lead, facts):
 <script src="{up}assets/js/schema.js"></script>
 <script src="{up}assets/js/forms.js"></script>
 <script>if(!window.ORVIO.API_URL){{document.getElementById('preview-flag').innerHTML='<div class="preview-flag"><strong>Preview</strong>This registration page is in preview mode. Registrations are kept in this browser only until the live system is connected.</div>';}}</script>"""
-    page(f"rtfa2026/{key}/index.html", f"{title} · Registration", lead, body, 2, f'<link rel="stylesheet" href="{up}assets/css/event.css">', scripts)
+    page(f"rtfa2026/{key}/index.html", f"{title} · Registration", lead, body, 2, f'<link rel="stylesheet" href="{up}assets/css/event.css">', scripts, "reg")
 
 
 reg_page("training", "Rwanda Tourism Forum &amp; Awards 2026", "Hustle Academy Training on Practical AI for Marketing",
          "Hustle Academy Training on Practical AI for Marketing, 26th Nov 2026, online.",
          [("cal", "26th Nov 2026"), ("screen", "Online · 1–2 hours")])
 
-reg_page("forum", "Rwanda Tourism Forum &amp; Awards 2026", "Rwanda Tourism Forum, Gala Dinner &amp; Awards",
-         "Rwanda Tourism Forum, Gala Dinner & Awards, 27th Nov 2026, Kigali.",
+reg_page("forum", "", "Rwanda Tourism Forum &amp; Awards 2026",
+         "Rwanda Tourism Forum & Awards 2026, 27th Nov 2026, Kigali.",
          [("cal", "27th Nov 2026"), ("pin", "Kigali, Rwanda")])
 
 

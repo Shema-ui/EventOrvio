@@ -99,7 +99,7 @@
 
   /* ---------- shell ---------- */
   var NAV = [
-    { ev: "forum", title: "Forum, Gala Dinner & Awards" },
+    { ev: "forum", title: "Tourism Forum & Awards" },
     { ev: "training", title: "Hustle Academy Training" },
   ];
   function shell(ev, view) {
@@ -152,7 +152,7 @@
   /* ---------- dashboard ---------- */
   function dashboard(ev) {
     var view = shell(ev, "dashboard"), rows = active(cache[ev] || []), total = rows.length, html;
-    var title = ev === "forum" ? "Rwanda Tourism Forum, Gala Dinner & Awards" : "Hustle Academy Training on Practical AI for Marketing";
+    var title = ev === "forum" ? "Rwanda Tourism Forum & Awards 2026" : "Hustle Academy Training on Practical AI for Marketing";
     html = head(title, "Dashboard", ev);
     if (ev === "forum") {
       html += '<div class="stats">' +
@@ -180,7 +180,7 @@
   var tableState = { q: "", archived: false, filter: "" };
   function registrations(ev) {
     var view = shell(ev, "registrations");
-    var title = ev === "forum" ? "Rwanda Tourism Forum, Gala Dinner & Awards" : "Hustle Academy Training on Practical AI for Marketing";
+    var title = ev === "forum" ? "Rwanda Tourism Forum & Awards 2026" : "Hustle Academy Training on Practical AI for Marketing";
     var filterKey = ev === "forum" ? "category" : "association";
     var filterOpts = countBy(active(cache[ev] || []), filterKey).map(function (x) { return x[0]; });
     view.innerHTML = head(title, "Registrations", ev) +
@@ -274,7 +274,7 @@
     var rows = active(cache[ev] || []).map(function (r) { return [r.ref, fmtDate(r.timestamp, true)].concat(keys.map(function (k) { return r[k] == null ? "" : String(r[k]); })); });
     return [header].concat(rows);
   }
-  function fileBase(ev) { return CFG.event.code + "_" + (ev === "forum" ? "Forum-Gala-Dinner-Awards" : "Hustle-Academy-Training") + "_" + new Date().toLocaleDateString("en-CA", { timeZone: TZ }); }
+  function fileBase(ev) { return CFG.event.code + "_" + (ev === "forum" ? "Tourism-Forum-Awards" : "Hustle-Academy-Training") + "_" + new Date().toLocaleDateString("en-CA", { timeZone: TZ }); }
   function download(name, blob) { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
   function toCSV(aoa) { return "﻿" + aoa.map(function (row) { return row.map(function (v) { v = String(v == null ? "" : v); return /[",\n;]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","); }).join("\r\n"); }
   function withXLSX(cb) {
@@ -291,7 +291,7 @@
       var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheet); XLSX.writeFile(wb, name + ".xlsx");
     });
   }
-  function exportRows(ev, fmt) { saveAoa(exportTable(ev), fileBase(ev), ev === "forum" ? "Forum Gala Dinner Awards" : "Hustle Academy Training", fmt); }
+  function exportRows(ev, fmt) { saveAoa(exportTable(ev), fileBase(ev), ev === "forum" ? "Tourism Forum and Awards" : "Hustle Academy Training", fmt); }
   function exportCerts() {
     var rows = active(cache.training || []).slice().sort(function (a, b) { return (a.certificate_name || "").localeCompare(b.certificate_name || ""); });
     var aoa = [["No.", "Name on certificate", "Full name", "Organisation", "Email", "Reference"]].concat(rows.map(function (r, i) { return [i + 1, r.certificate_name, r.full_name, r.organisation, r.email, r.ref]; }));
