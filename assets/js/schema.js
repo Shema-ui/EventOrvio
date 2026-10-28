@@ -42,7 +42,7 @@
     { section: "Contact information" },
     { key: "phone", label: "Mobile telephone number", type: "tel", required: true, placeholder: "+250 7XX XXX XXX", autocomplete: "tel", half: true },
     { key: "phone_alt", label: "Alternative telephone number", type: "tel", required: false, placeholder: "+250 7XX XXX XXX", half: true },
-    { key: "email", label: "Email address", type: "email", required: true, autocomplete: "email", help: "Your confirmation and the session link will be sent here." },
+    { key: "email", label: "Email address", type: "email", required: true, autocomplete: "email", help: "Your confirmation will be sent here." },
 
     { section: "Business location" },
     { key: "province", label: "Province", type: "province", required: true, half: true },
@@ -50,7 +50,7 @@
     { key: "sector", label: "Sector", type: "text", required: true, placeholder: "e.g. Kimironko" },
 
     { section: "Relevance of the training" },
-    { key: "marketing_role", label: "Your role in marketing and customer engagement", type: "radio", required: true, options: ["Directly responsible", "Partially responsible", "Not currently responsible"] },
+    { key: "marketing_role", label: "Your role in marketing and customer engagement", type: "radio", required: true, options: ["Directly responsible", "Partially responsible"] },
 
     { section: "Certificate" },
     { key: "certificate_name", label: "Name as it should appear on your certificate", type: "certificate", required: true, help: "Check the spelling carefully. Certificates are printed exactly as entered." },
@@ -58,7 +58,6 @@
     { section: "Monitoring & evaluation" },
     { key: "objective", label: "Main objective for attending the training", type: "textarea", required: true },
     { key: "expected_skills", label: "Skills or knowledge you expect to gain", type: "textarea", required: true },
-    { key: "heard_from", label: "How did you hear about this training?", type: "select", required: false, options: ["RCOT / my association", "Email invitation", "WhatsApp", "Social media", "A colleague", "Other"] },
 
     { section: "" },
     { key: "consent", label: CONSENT, type: "consent", required: true },
@@ -70,17 +69,11 @@
     { key: "job_title", label: "Position / job title", type: "text", required: true, autocomplete: "organization-title", half: true },
     { key: "organisation", label: "Organisation", type: "text", required: true, autocomplete: "organization" },
     { key: "category", label: "Participant category", type: "select", required: true, options: ["Delegate", "Speaker / Panelist", "Exhibitor", "Sponsor / Partner", "Award Nominee", "Government / Public Institution", "Development Partner", "Media", "Student", "Other"] },
-    { key: "association", label: "Association membership", type: "select", required: false, options: ASSOCIATIONS },
 
     { section: "Contact details" },
     { key: "email", label: "Email address", type: "email", required: true, autocomplete: "email", half: true, help: "Your confirmation will be sent here." },
     { key: "phone", label: "Mobile telephone number", type: "tel", required: true, placeholder: "+250 7XX XXX XXX", autocomplete: "tel", half: true },
-    { key: "country", label: "Country of residence", type: "text", required: true, value: "Rwanda", half: true },
-    { key: "nationality", label: "Nationality", type: "text", required: false, placeholder: "e.g. Rwandan", half: true },
-
-    { section: "Attendance" },
-    { key: "dietary", label: "Dietary requirements", type: "select", required: false, options: ["None", "Vegetarian", "Vegan", "Halal", "Gluten-free", "Other (we'll contact you)"], half: true },
-    { key: "accessibility", label: "Accessibility needs", type: "text", required: false, placeholder: "Let us know how we can help", half: true },
+    { key: "country", label: "Country of residence", type: "text", required: true, value: "Rwanda" },
 
     { section: "" },
     { key: "consent", label: "I agree that the organisers may use my details to manage this registration and send me event information.", type: "consent", required: true },

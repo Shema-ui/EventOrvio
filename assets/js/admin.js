@@ -154,9 +154,7 @@
         stat("Countries represented", distinct(rows, "country"), "Connecting people across borders", "globe") +
         stat("Delegate categories", distinct(rows, "category"), "A community of tourism perspectives", "layers", true) + "</div>" +
         '<div class="duo">' + breakdown("Who's joining", "Registrations by delegate category", "users", countBy(rows, "category"), total) +
-        breakdown("Where we're connecting", "Registrations by country of residence", "globe", countBy(rows, "country"), total) + "</div>" +
-        '<div class="duo">' + breakdown("Associations", "Registrations by association membership", "layers", countBy(rows, "association"), total) +
-        breakdown("Dietary requirements", "For catering planning", "chart", countBy(rows, "dietary"), total) + "</div>";
+        breakdown("Where we're connecting", "Registrations by country of residence", "globe", countBy(rows, "country"), total) + "</div>";
     } else {
       html += '<div class="stats">' +
         stat("Total registrations", total, "Current registrations · archived records excluded", "users") +
@@ -294,7 +292,7 @@
     var rows = previewLoad(ev), now = Date.now();
     names.forEach(function (n, i) {
       var base = { ref: (ev === "forum" ? "RTF" : "TRN") + "-SMP" + i + Math.floor(Math.random() * 9), timestamp: new Date(now - i * 26 * 3600e3).toISOString(), full_name: n[0] + " (sample)", organisation: n[1], email: "sample" + i + "@example.com", phone: "+250 78" + (1000000 + i * 1234567).toString().slice(0, 7), sample: true };
-      if (ev === "forum") Object.assign(base, { job_title: ["Managing Director", "Marketing Manager", "Operations Lead"][i % 3], category: ["Delegate", "Exhibitor", "Award Nominee", "Delegate", "Media", "Sponsor / Partner"][i], country: ["Rwanda", "Rwanda", "Uganda", "Kenya", "Rwanda", "Tanzania"][i], association: S.training[1].options[i % 8], dietary: ["None", "Vegetarian", "None", "Halal", "None", "None"][i], consent: "Yes" });
+      if (ev === "forum") Object.assign(base, { job_title: ["Managing Director", "Marketing Manager", "Operations Lead"][i % 3], category: ["Delegate", "Exhibitor", "Award Nominee", "Delegate", "Media", "Sponsor / Partner"][i], country: ["Rwanda", "Rwanda", "Uganda", "Kenya", "Rwanda", "Tanzania"][i], consent: "Yes" });
       else Object.assign(base, { association: S.training[1].options[i % 8], gender: i % 2 ? "Male" : "Female", age_group: ["25–34", "35–44", "25–34", "45–54", "18–24", "35–44"][i], job_title: "Marketing Officer", department: "Sales & Marketing", province: ["Kigali City", "Western Province", "Kigali City", "Eastern Province", "Southern Province", "Western Province"][i], district: ["Gasabo", "Rubavu", "Kicukiro", "Kayonza", "Huye", "Karongi"][i], sector: "Sample sector", marketing_role: ["Directly responsible", "Partially responsible", "Directly responsible", "Directly responsible", "Partially responsible", "Not currently responsible"][i], certificate_name: n[0], objective: "Use AI to plan campaigns", expected_skills: "Content creation with AI tools", consent: "Yes" });
       rows.push(base);
     });

@@ -53,7 +53,7 @@ def footer(up):
 
 
 # ---------- Registration pages ----------
-def reg_page(key, kicker, title, lead, facts, aside):
+def reg_page(key, kicker, title, lead, facts):
     up = "../../"
     facts_html = "".join(f'<span class="fact">{ICON[i]}{t}</span>' for i, t in facts)
     body = f"""{topbar(up, key)}
@@ -61,20 +61,16 @@ def reg_page(key, kicker, title, lead, facts, aside):
 <section class="hero"><div class="wrap hero-inner">
 <p class="eyebrow">{kicker}</p>
 <h1>{title}</h1>
-<p class="lead">{lead}</p>
 <div class="facts">{facts_html}</div>
 </div>{HILLS}</section>
 <div class="wrap reg-layout" data-reg="{key}">
+<div id="preview-flag"></div>
 <section class="card" id="reg-card" aria-labelledby="form-title">
 <h2 id="form-title">Registration form</h2>
-<p class="small">Fields marked <span class="req">*</span> are required. It takes about {'4' if key == 'training' else '2'} minutes.</p>
+<p class="small">Fields marked <span class="req">*</span> are required.</p>
 <form id="reg-form" novalidate></form>
 <noscript><p>Please enable JavaScript to register.</p></noscript>
 </section>
-<aside class="aside">
-<div id="preview-flag"></div>
-{aside}
-</aside>
 </div>
 </main>
 {footer(up)}"""
@@ -86,16 +82,12 @@ def reg_page(key, kicker, title, lead, facts, aside):
 
 
 reg_page("training", "Pre-Forum Training · Google Hustle Academy", "Practical AI for Marketing",
-         "A practical online session on using AI to plan, create and measure tourism marketing, delivered by Google Hustle Academy ahead of the Rwanda Tourism Forum.",
-         [("cal", "Thursday, 26 November 2026"), ("screen", "Online · 1–2 hours")],
-         """<div class="card"><h3>What you'll get</h3><ul><li>Hands-on AI tools for marketing content and campaigns</li><li>Practical examples from tourism and hospitality</li><li>A certificate of participation</li></ul></div>
-<div class="card"><h3>Before the session</h3><ul><li>You'll receive a confirmation email right after registering</li><li>The joining link is sent before 26 November</li><li>Check your certificate name carefully</li></ul></div>""")
+         "Pre-Forum Training: Practical AI for Marketing, by Google Hustle Academy. Thursday 26 November 2026, online.",
+         [("cal", "Thursday, 26 November 2026"), ("screen", "Online · 1–2 hours")])
 
 reg_page("forum", "Main Forum · Rwanda Chamber of Tourism", "Rwanda Tourism Forum &amp; Awards 2026",
-         "Join around 400 tourism leaders, operators and partners in Kigali for a day of industry dialogue, partnerships and the Rwanda Tourism Awards.",
-         [("cal", "Friday, 27 November 2026"), ("pin", "Kigali, Rwanda"), ("users", "Around 400 delegates")],
-         """<div class="card"><h3>At the Forum</h3><ul><li>Industry dialogue on the future of Rwandan tourism</li><li>Networking with operators, partners and government</li><li>The Rwanda Tourism Awards</li></ul></div>
-<div class="card"><h3>After you register</h3><ul><li>A confirmation email with your reference number</li><li>Venue and programme details before the event</li></ul></div>""")
+         "Main Forum registration. Friday 27 November 2026, Kigali.",
+         [("cal", "Friday, 27 November 2026"), ("pin", "Kigali, Rwanda"), ("users", "Around 400 participants")])
 
 
 # ---------- Admin ----------

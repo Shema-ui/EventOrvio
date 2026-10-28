@@ -26,7 +26,7 @@ window.ORVIO = {
       date: "Thursday, 26 November 2026",
       dateISO: "2026-11-26",
       format: "Online · 1–2 hours",
-      blurb: "A practical, hands-on session on using AI tools to plan, create and measure tourism marketing. Delivered online by Google Hustle Academy ahead of the Forum.",
+      blurb: "Pre-Forum Training by Google Hustle Academy. Online, 1–2 hours.",
       refPrefix: "TRN",
     },
     forum: {
@@ -36,7 +36,7 @@ window.ORVIO = {
       date: "Friday, 27 November 2026",
       dateISO: "2026-11-27",
       format: "In person · Kigali",
-      blurb: "The tourism sector's flagship gathering: industry dialogue, partnerships and the Rwanda Tourism Awards, bringing together around 400 leaders, operators and partners.",
+      blurb: "Main Forum, Kigali.",
       refPrefix: "RTF",
     },
   },

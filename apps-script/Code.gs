@@ -28,7 +28,7 @@ const EVENTS = {
     title: 'Practical AI for Marketing',
     subtitle: 'Pre-Forum Training by Google Hustle Academy',
     date: 'Thursday, 26 November 2026',
-    where: 'Online (1–2 hours). Your joining link will be emailed before the session.',
+    where: 'Online (1–2 hours)',
   },
   forum: {
     sheet: 'Main Forum',
@@ -36,7 +36,7 @@ const EVENTS = {
     title: 'Rwanda Tourism Forum & Awards 2026',
     subtitle: 'Main Forum',
     date: 'Friday, 27 November 2026',
-    where: 'Kigali, Rwanda. Venue and programme details will follow by email.',
+    where: 'Kigali, Rwanda',
   },
 };
 
