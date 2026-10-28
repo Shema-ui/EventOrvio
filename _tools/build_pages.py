@@ -41,14 +41,16 @@ def page(path, title, desc, body, depth, extra_head="", scripts="", body_class="
 
 
 def topbar(up, current=""):
-    return """<header class="topbar"><div class="wrap topbar-inner">
-<span class="host"><span class="host-mark"><span>RCOT</span></span><span class="host-name">Rwanda Chamber of Tourism<small>Rwanda Tourism Forum &amp; Awards 2026</small></span></span>
+    sub = "" if current == "training" else "<small>Rwanda Tourism Forum &amp; Awards 2026</small>"
+    return f"""<header class="topbar"><div class="wrap topbar-inner">
+<span class="host"><span class="host-mark"><span>RCOT</span></span><span class="host-name">Rwanda Chamber of Tourism{sub}</span></span>
 </div></header>"""
 
 
-def footer(up):
+def footer(up, key=""):
+    lead = "" if key == "training" else "Rwanda Tourism Forum &amp; Awards 2026 · "
     return f"""<footer class="foot"><div class="wrap foot-inner">
-<span>Rwanda Tourism Forum &amp; Awards 2026 · Organised with Global Planners Ltd</span>
+<span>{lead}Organised with Global Planners Ltd</span>
 <span class="powered">Registration by <strong>Orvio Systems</strong></span></div></footer>"""
 
 
@@ -73,7 +75,7 @@ def reg_page(key, kicker, title, lead, facts):
 </section>
 </div>
 </main>
-{footer(up)}"""
+{footer(up, key)}"""
     scripts = f"""<script src="{up}assets/js/config.js"></script>
 <script src="{up}assets/js/schema.js"></script>
 <script src="{up}assets/js/forms.js"></script>
@@ -81,7 +83,7 @@ def reg_page(key, kicker, title, lead, facts):
     page(f"rtfa2026/{key}/index.html", f"{title} · Registration", lead, body, 2, f'<link rel="stylesheet" href="{up}assets/css/event.css">', scripts, "reg")
 
 
-reg_page("training", "Rwanda Tourism Forum &amp; Awards 2026", "Hustle Academy Training on Practical AI for Marketing",
+reg_page("training", "", "Hustle Academy Training on Practical AI for Marketing",
          "Hustle Academy Training on Practical AI for Marketing, 26th Nov 2026, online.",
          [("cal", "26th Nov 2026"), ("screen", "Online · 1–2 hours")])
 

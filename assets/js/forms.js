@@ -37,7 +37,7 @@
       html += '<div class="' + cls + '"><label for="' + id + '">' + esc(f.label) + req(f) + '</label><textarea id="' + id + '" name="' + f.key + '" rows="3"' + r + desc + ' maxlength="1000"></textarea>' + help + "</div>";
     } else if (f.type === "certificate") {
       html += '<div class="' + cls + ' cert-field"><label for="' + id + '">' + esc(f.label) + req(f) + '</label><input id="' + id + '" name="' + f.key + '" type="text"' + r + desc + ' maxlength="80" autocomplete="off">' + help +
-        '<div class="cert-preview" aria-hidden="true"><span class="cert-kicker">Certificate of Participation</span><span class="cert-name" id="cert-name">Your Name</span><span class="cert-course">' + esc(session.title) + " · " + esc(session.partner) + "</span></div></div>";
+        '<div class="cert-preview" aria-hidden="true"><span class="cert-kicker">Certificate of Participation</span><span class="cert-name" id="cert-name">Your Name</span><span class="cert-course">' + esc(session.title) + "</span></div></div>";
     } else if (f.type === "consent") {
       html += '<div class="field consent"><label class="check"><input type="checkbox" id="' + id + '" name="' + f.key + '" value="Yes"' + r + "><span>" + esc(f.label) + req(f) + "</span></label></div>";
     } else {
