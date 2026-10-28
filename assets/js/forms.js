@@ -132,8 +132,14 @@
   function previewSave(payload) {
     var key = "orvio_" + CFG.event.code + "_" + eventKey, list = [];
     try { list = JSON.parse(localStorage.getItem(key) || "[]"); } catch (e) { list = []; }
-    var dupe = list.filter(function (r) { return (r.email || "").toLowerCase() === (payload.data.email || "").toLowerCase(); })[0];
-    if (dupe) return Promise.resolve({ ok: true, ref: dupe.ref, duplicate: true });
+    var email = (payload.data.email || "").trim().toLowerCase();
+    for (var i = 0; i < list.length; i++) {
+      if ((list[i].email || "").toLowerCase() === email) {
+        list[i] = Object.assign({}, list[i], payload.data, { email: email, updated_at: new Date().toISOString() });
+        try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) { /* storage unavailable */ }
+        return Promise.resolve({ ok: true, ref: list[i].ref, updated: true, preview: true });
+      }
+    }
     var rec = Object.assign({ ref: makeRef(), timestamp: new Date().toISOString() }, payload.data);
     list.push(rec);
     try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) { /* storage unavailable */ }
@@ -183,11 +189,11 @@
     card.innerHTML =
       '<div class="success" tabindex="-1">' +
       '<div class="success-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>' +
-      "<h2>" + (res.duplicate ? "You're already registered" : "You're registered") + "</h2>" +
-      "<p>" + (res.duplicate ? "We found an existing registration for this email address." : "Thank you, " + esc((data.full_name || "").split(" ")[0]) + ". Your place for <strong>" + esc(session.title) + "</strong> is confirmed.") + "</p>" +
+      "<h2>" + (res.updated ? "Registration updated" : "You're registered") + "</h2>" +
+      "<p>" + (res.updated ? "This email address was already registered, so we've replaced your earlier details with the ones below. Your reference number stays the same." : "Thank you, " + esc((data.full_name || "").split(" ")[0]) + ". Your place for <strong>" + esc(session.title) + "</strong> is confirmed.") + "</p>" +
       '<p class="ref">Reference <strong>' + esc(res.ref) + "</strong></p>" +
       '<dl class="summary">' + rows.map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1] || "–") + "</dd></div>"; }).join("") + "</dl>" +
-      "<p class=\"small\">" + (PREVIEW ? "Preview mode: in the live system a confirmation email is sent to " + esc(data.email) + "." : "A confirmation email has been sent to " + esc(data.email) + ". Check your spam folder if it doesn't arrive within a few minutes.") + "</p>" +
+      "<p class=\"small\">" + (PREVIEW ? "Preview mode: in the live system a confirmation email is sent to " + esc(data.email) + "." : (res.updated ? "An updated confirmation email has been sent to " : "A confirmation email has been sent to ") + esc(data.email) + ". Check your spam folder if it doesn't arrive within a few minutes.") + "</p>" +
       '<div class="success-actions"><a class="btn btn-primary" href="' + ics() + '" download="' + eventKey + '-' + CFG.event.code + '.ics">Add to calendar</a><a class="btn btn-ghost" href="./">Register someone else</a></div>' +
       "</div>";
     var s = card.querySelector(".success"); s.focus(); card.scrollIntoView({ behavior: "smooth", block: "start" });

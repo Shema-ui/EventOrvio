@@ -6,7 +6,9 @@
  *  - Saves every registration as a row in this Google Sheet (one tab per event)
  *  - Gives each registrant a reference number (TRN-0001, RTF-0001 …)
  *  - Sends a branded confirmation email from the Google account that owns the script
- *  - Lets the admin dashboard read registrations and archive test entries (needs ADMIN_KEY)
+ *  - Registering again with the same email updates the existing registration
+ *  - Lets the admin dashboard read registrations and archive entries (ADMIN_KEY)
+ *  - Super admins (SUPER_KEY) can also delete registrations permanently
  *
  * Setup: see README.md → "Connect the Google Sheet".
  */
@@ -14,7 +16,10 @@
 // 1) CHANGE THIS to a long, private password for the admin dashboard.
 const ADMIN_KEY = 'CHANGE-ME-to-a-long-private-key';
 
-// 2) Optional: where replies to the confirmation email should go.
+// 2) CHANGE THIS to a different password for the super admin (can permanently delete).
+const SUPER_KEY = 'CHANGE-ME-super-admin-key';
+
+// 3) Optional: where replies to the confirmation email should go.
 const REPLY_TO = '';
 
 const EVENT_NAME = 'Rwanda Tourism Forum & Awards 2026';
@@ -52,6 +57,7 @@ function doPost(e) {
     const body = JSON.parse(e.postData.contents || '{}');
     if (body.action === 'register') return json(register(body));
     if (body.action === 'archive') return json(archive(body));
+    if (body.action === 'delete') return json(remove(body));
     return json({ ok: false, error: 'Unknown action' });
   } catch (err) {
     return json({ ok: false, error: String(err && err.message || err) });
@@ -61,11 +67,18 @@ function doPost(e) {
 function doGet(e) {
   const p = (e && e.parameter) || {};
   if (p.action === 'list') {
-    if (p.key !== ADMIN_KEY) return json({ ok: false, error: 'Invalid access key' });
+    const r = role(p.key);
+    if (!r) return json({ ok: false, error: 'Invalid access key' });
     if (!EVENTS[p.event]) return json({ ok: false, error: 'Unknown event' });
-    return json({ ok: true, rows: readRows(p.event) });
+    return json({ ok: true, role: r, rows: readRows(p.event) });
   }
   return json({ ok: true, service: 'Orvio registration', event: EVENT_NAME });
+}
+
+function role(key) {
+  if (key && key === SUPER_KEY) return 'super';
+  if (key && key === ADMIN_KEY) return 'admin';
+  return null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -85,37 +98,47 @@ function register(body) {
   // Trim and cap every value so nobody can flood the sheet.
   Object.keys(data).forEach(function (k) { data[k] = String(data[k] == null ? '' : data[k]).trim().slice(0, 1000); });
   data.email = email;
+  const now = new Date().toISOString();
+  data.updated_at = '';
+  labels.updated_at = 'Last updated (UTC)';
 
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
-  let ref, duplicate = false;
+  let ref, updated = false;
   try {
     const sheet = getSheet(ev.sheet);
     const keys = ensureColumns(sheet, data, labels);
 
-    // One registration per email address per event.
+    const clean = function (v) { v = v == null ? '' : String(v); return /^[=+\-@]/.test(v) ? "'" + v : v; };   // stop spreadsheet formulas
+
+    // Same email again = the person is correcting their registration: update that row.
     const emailCol = keys.indexOf('email');
     const last = sheet.getLastRow();
+    let rowNum = 0;
     if (last > 2 && emailCol >= 0) {
       const emails = sheet.getRange(3, emailCol + 1, last - 2, 1).getValues();
       for (let i = 0; i < emails.length; i++) {
-        if (String(emails[i][0]).toLowerCase() === email) {
-          ref = sheet.getRange(i + 3, 1).getValue();
-          duplicate = true;
-          break;
-        }
+        if (String(emails[i][0]).trim().toLowerCase() === email) { rowNum = i + 3; break; }
       }
     }
 
-    if (!duplicate) {
-      const count = Math.max(0, sheet.getLastRow() - 2);
-      ref = ev.prefix + '-' + ('000' + (count + 1)).slice(-4);
+    if (rowNum) {
+      const old = sheet.getRange(rowNum, 1, 1, keys.length).getValues()[0];
+      ref = old[0];
+      updated = true;
+      data.updated_at = now;
+      const row = keys.map(function (k, i) {
+        if (k === 'ref' || k === 'timestamp' || k === 'archived') return old[i];
+        return k in data ? clean(data[k]) : old[i];
+      });
+      sheet.getRange(rowNum, 1, 1, keys.length).setValues([row]);
+    } else {
+      ref = nextRef(sheet, ev.prefix);
       const row = keys.map(function (k) {
         if (k === 'ref') return ref;
-        if (k === 'timestamp') return new Date().toISOString();
+        if (k === 'timestamp') return now;
         if (k === 'archived') return '';
-        const v = data[k] == null ? '' : data[k];
-        return /^[=+\-@]/.test(v) ? "'" + v : v;   // stop spreadsheet formulas
+        return clean(data[k]);
       });
       sheet.appendRow(row);
     }
@@ -123,14 +146,25 @@ function register(body) {
     lock.releaseLock();
   }
 
-  if (!duplicate) {
-    try { sendConfirmation(body.event, ev, data, ref); } catch (err) { console.error('Email failed', err); }
+  try { sendConfirmation(body.event, ev, data, ref, updated); } catch (err) { console.error('Email failed', err); }
+  return { ok: true, ref: ref, updated: updated };
+}
+
+// Next reference number, safe even after rows have been deleted.
+function nextRef(sheet, prefix) {
+  const last = sheet.getLastRow();
+  let max = 0;
+  if (last > 2) {
+    sheet.getRange(3, 1, last - 2, 1).getValues().forEach(function (r) {
+      const n = parseInt(String(r[0]).split('-').pop(), 10);
+      if (n > max) max = n;
+    });
   }
-  return { ok: true, ref: ref, duplicate: duplicate };
+  return prefix + '-' + ('000' + (max + 1)).slice(-4);
 }
 
 function archive(body) {
-  if (body.key !== ADMIN_KEY) return { ok: false, error: 'Invalid access key' };
+  if (!role(body.key)) return { ok: false, error: 'Invalid access key' };
   const ev = EVENTS[body.event];
   if (!ev) return { ok: false, error: 'Unknown event' };
   const sheet = getSheet(ev.sheet);
@@ -144,6 +178,26 @@ function archive(body) {
     }
   }
   return { ok: false, error: 'Not found' };
+}
+
+function remove(body) {
+  if (role(body.key) !== 'super') return { ok: false, error: 'Only a super admin can delete registrations' };
+  const ev = EVENTS[body.event];
+  if (!ev) return { ok: false, error: 'Unknown event' };
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const sheet = getSheet(ev.sheet);
+    const last = sheet.getLastRow();
+    if (last < 3) return { ok: false, error: 'Not found' };
+    const refs = sheet.getRange(3, 1, last - 2, 1).getValues();
+    for (let i = 0; i < refs.length; i++) {
+      if (refs[i][0] === body.ref) { sheet.deleteRow(i + 3); return { ok: true }; }
+    }
+    return { ok: false, error: 'Not found' };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -211,7 +265,7 @@ function readRows(eventKey) {
 /* Confirmation email                                                  */
 /* ------------------------------------------------------------------ */
 
-function sendConfirmation(eventKey, ev, d, ref) {
+function sendConfirmation(eventKey, ev, d, ref, updated) {
   const first = String(d.full_name).split(' ')[0];
   const rows = [['Reference', ref], ['Name', d.full_name], ['Organisation', d.organisation], ['Email', d.email], ['Phone', d.phone]];
   if (eventKey === 'training') rows.push(['Name on certificate', d.certificate_name]);
@@ -232,7 +286,9 @@ function sendConfirmation(eventKey, ev, d, ref) {
     '<div style="height:6px;background:#e0a823"></div>' +
     '<div style="padding:26px 28px;color:#3a4742;font-size:15px;line-height:1.6">' +
     '<p style="margin:0 0 14px">Dear ' + esc(first) + ',</p>' +
-    '<p style="margin:0 0 14px">Thank you for registering. Your place is <strong>confirmed</strong>.</p>' +
+    (updated
+      ? '<p style="margin:0 0 14px">Your registration has been <strong>updated</strong> with the details below. Your place remains confirmed.</p>'
+      : '<p style="margin:0 0 14px">Thank you for registering. Your place is <strong>confirmed</strong>.</p>') +
     '<p style="margin:0 0 4px"><strong>Date:</strong> ' + esc(ev.date) + '</p>' +
     '<p style="margin:0 0 18px"><strong>Where:</strong> ' + esc(ev.where) + '</p>' +
     '<table style="width:100%;border-collapse:collapse;font-size:14px">' + table + '</table>' +
@@ -241,7 +297,7 @@ function sendConfirmation(eventKey, ev, d, ref) {
     '<div style="padding:14px 28px;background:#f6f4ee;color:#697570;font-size:12px">Registration powered by Orvio Systems</div>' +
     '</div></div>';
 
-  const options = { to: d.email, subject: 'Registration confirmed: ' + ev.title + ' (' + ref + ')', htmlBody: html, name: SENDER_NAME };
+  const options = { to: d.email, subject: (updated ? 'Registration updated: ' : 'Registration confirmed: ') + ev.title + ' (' + ref + ')', htmlBody: html, name: SENDER_NAME };
   if (REPLY_TO) options.replyTo = REPLY_TO;
   MailApp.sendEmail(options);
 }

@@ -3,7 +3,7 @@
   "use strict";
   var CFG = window.ORVIO, S = window.ORVIO_SCHEMA;
   var PREVIEW = !CFG.API_URL;
-  var KEY_STORE = "orvio_admin_key";
+  var KEY_STORE = "orvio_admin_key", ROLE_STORE = "orvio_admin_role";
   var TZ = "Africa/Kigali";
   var app = document.getElementById("app");
   var cache = { training: null, forum: null }, lastSync = null, timer = null;
@@ -35,7 +35,10 @@
   function dayKey(iso) { var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { timeZone: TZ }); }
   function labelsFor(ev) { var m = {}; S[ev].forEach(function (f) { if (f.key) m[f.key] = f.type === "consent" ? "Consent" : f.label; }); return m; }
   function getKey() { try { return sessionStorage.getItem(KEY_STORE) || ""; } catch (e) { return ""; } }
-  function setKey(k) { try { k ? sessionStorage.setItem(KEY_STORE, k) : sessionStorage.removeItem(KEY_STORE); } catch (e) {} }
+  function setKey(k) { try { k ? sessionStorage.setItem(KEY_STORE, k) : sessionStorage.removeItem(KEY_STORE); } catch (e) {} if (!k) setRole(""); }
+  function getRole() { try { return sessionStorage.getItem(ROLE_STORE) || "admin"; } catch (e) { return "admin"; } }
+  function setRole(r) { try { r ? sessionStorage.setItem(ROLE_STORE, r) : sessionStorage.removeItem(ROLE_STORE); } catch (e) {} }
+  function isSuper() { return getRole() === "super"; }
 
   /* ---------- data ---------- */
   function previewKey(ev) { return "orvio_" + CFG.event.code + "_" + ev; }
@@ -53,6 +56,7 @@
     if (PREVIEW) { cache[ev] = previewLoad(ev); return Promise.resolve(cache[ev]); }
     return api({ action: "list", event: ev, key: getKey() }).then(function (res) {
       if (!res.ok) throw new Error(res.error || "Could not load");
+      if (res.role) setRole(res.role);
       cache[ev] = res.rows || []; return cache[ev];
     });
   }
@@ -62,6 +66,10 @@
       previewStore(ev, rows); return Promise.resolve();
     }
     return apiPost({ action: "archive", key: getKey(), event: ev, ref: ref, archived: archived }).then(function (res) { if (!res.ok) throw new Error(res.error); });
+  }
+  function deleteReg(ev, ref) {
+    if (PREVIEW) { previewStore(ev, previewLoad(ev).filter(function (r) { return r.ref !== ref; })); return Promise.resolve(); }
+    return apiPost({ action: "delete", key: getKey(), event: ev, ref: ref }).then(function (res) { if (!res.ok) throw new Error(res.error); });
   }
   function active(rows) { return rows.filter(function (r) { return !r.archived; }); }
 
@@ -74,17 +82,17 @@
       '<label for="key">Access key</label><input id="key" type="password" autocomplete="current-password" required' + (PREVIEW ? ' value="preview"' : "") + ">" +
       '<button class="btn btn-primary" type="submit">Sign in</button>' +
       '<p class="login-err" role="alert">' + esc(err || "") + "</p>" +
-      (PREVIEW ? '<p class="small" style="margin:0;font-size:13px;color:var(--muted)">Preview mode: any access key works.</p>' : "") +
+      (PREVIEW ? '<p class="small" style="margin:0;font-size:13px;color:var(--muted)">Preview mode: any access key works. Type "super" to try the super admin view.</p>' : "") +
       "</form></main>";
     document.getElementById("login").addEventListener("submit", function (e) {
       e.preventDefault();
       var k = document.getElementById("key").value.trim(); if (!k) return;
       setKey(k);
-      if (PREVIEW) { route(); return; }
+      if (PREVIEW) { setRole(k.toLowerCase() === "super" ? "super" : "admin"); route(); return; }
       var btn = e.target.querySelector("button"); btn.disabled = true; btn.textContent = "Checking…";
       api({ action: "list", event: "forum", key: k }).then(function (res) {
         if (!res.ok) { setKey(""); renderLogin("That access key isn't valid."); return; }
-        cache.forum = res.rows || []; route();
+        setRole(res.role || "admin"); cache.forum = res.rows || []; route();
       }).catch(function () { setKey(""); renderLogin("Couldn't reach the registration server. Try again."); });
     });
   }
@@ -226,12 +234,14 @@
   function openDetail(ev, ref) {
     var r = (cache[ev] || []).filter(function (x) { return x.ref === ref; })[0]; if (!r) return;
     var labels = labelsFor(ev), drawer = document.getElementById("drawer"), panel = document.getElementById("drawer-panel");
-    var rows = [["Reference", r.ref], ["Registered", fmtDate(r.timestamp, true)]].concat(Object.keys(labels).map(function (k) { return [labels[k], r[k]]; }));
+    var rows = [["Reference", r.ref], ["Registered", fmtDate(r.timestamp, true)]].concat(r.updated_at ? [["Last updated", fmtDate(r.updated_at, true)]] : []).concat(Object.keys(labels).map(function (k) { return [labels[k], r[k]]; }));
     panel.innerHTML = '<button class="close-x" aria-label="Close" id="dr-close">×</button><h2 id="dr-title">' + esc(r.full_name) + '</h2><p class="page-sub">' + esc(r.organisation || "") + "</p>" +
       "<dl>" + rows.map(function (x) { return "<div><dt>" + esc(x[0]) + "</dt><dd>" + esc(x[1] || "–") + "</dd></div>"; }).join("") + "</dl>" +
       '<div class="drawer-actions"><a class="btn btn-line" href="mailto:' + esc(r.email) + '">Email</a>' + (r.phone ? '<a class="btn btn-line" href="https://wa.me/' + esc(String(r.phone).replace(/\D/g, "")) + '" target="_blank" rel="noopener">WhatsApp</a>' : "") +
       '<button class="btn ' + (r.archived ? "btn-primary" : "btn-line") + '" id="dr-arch">' + (r.archived ? "Restore registration" : "Archive registration") + "</button></div>" +
-      '<p class="caption" style="margin-top:14px">Archived registrations are hidden from counts and exports but never deleted.</p>';
+      '<p class="caption" style="margin-top:14px">Archived registrations are hidden from counts and exports but never deleted.</p>' +
+      (isSuper() ? '<div class="danger-zone"><p class="danger-title">Super admin</p><p class="caption">Deleting removes this registration from the Google Sheet permanently. This can\'t be undone.</p>' +
+        '<div class="drawer-actions" id="del-wrap"><button class="btn btn-danger" id="dr-del">Delete permanently</button></div></div>' : "");
     drawer.hidden = false;
     var close = function () { drawer.hidden = true; document.removeEventListener("keydown", onKey); };
     var onKey = function (e) { if (e.key === "Escape") close(); };
@@ -239,6 +249,17 @@
     panel.querySelector("#dr-close").addEventListener("click", close);
     panel.querySelector("#dr-close").focus();
     drawer.addEventListener("click", function (e) { if (e.target === drawer) close(); }, { once: true });
+    var del = panel.querySelector("#dr-del");
+    if (del) del.addEventListener("click", function () {
+      var wrap = panel.querySelector("#del-wrap");
+      wrap.innerHTML = '<span class="confirm-q">Delete ' + esc(r.full_name) + ' for good?</span><button class="btn btn-danger" id="del-yes">Yes, delete</button><button class="btn btn-line" id="del-no">Cancel</button>';
+      wrap.querySelector("#del-no").addEventListener("click", function () { close(); openDetail(ev, ref); });
+      wrap.querySelector("#del-yes").addEventListener("click", function () {
+        var b = this; b.disabled = true; b.textContent = "Deleting…";
+        deleteReg(ev, r.ref).then(function () { return load(ev); }).then(function () { close(); route(); })
+          .catch(function () { b.disabled = false; b.textContent = "Couldn't delete. Try again"; });
+      });
+    });
     panel.querySelector("#dr-arch").addEventListener("click", function () {
       var b = this; b.disabled = true;
       setArchived(ev, r.ref, !r.archived).then(function () { return load(ev); }).then(function () { close(); route(); })
