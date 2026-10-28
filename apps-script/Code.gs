@@ -152,8 +152,19 @@ function archive(body) {
 /* data starts on row 3.                                               */
 /* ------------------------------------------------------------------ */
 
+function getSpreadsheet() {
+  const active = SpreadsheetApp.getActiveSpreadsheet();
+  if (active) return active;
+  const props = PropertiesService.getScriptProperties();
+  const id = props.getProperty('SHEET_ID');
+  if (id) return SpreadsheetApp.openById(id);
+  const ss = SpreadsheetApp.create('RTFA 2026 Registrations');
+  props.setProperty('SHEET_ID', ss.getId());
+  return ss;
+}
+
 function getSheet(name) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSpreadsheet();
   let sh = ss.getSheetByName(name);
   if (!sh) {
     sh = ss.insertSheet(name);
@@ -248,5 +259,6 @@ function esc(s) {
 function testSetup() {
   const me = Session.getActiveUser().getEmail();
   const res = register({ event: 'training', data: { full_name: 'Test Person', email: me, organisation: 'Test Org', phone: '+250 700 000 000', certificate_name: 'Test Person', consent: 'Yes' }, labels: { full_name: 'Full name', email: 'Email address', organisation: 'Business / organisation name', phone: 'Mobile telephone number', certificate_name: 'Name as it should appear on your certificate', consent: 'Consent' } });
-  console.log(JSON.stringify(res) + ' — check ' + me + ' for the confirmation email, then archive the test row in the dashboard.');
+  console.log(JSON.stringify(res) + ' — check ' + me + ' for the confirmation email.');
+  console.log('Your registrations Sheet: ' + getSpreadsheet().getUrl());
 }
