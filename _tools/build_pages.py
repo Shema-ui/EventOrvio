@@ -87,7 +87,7 @@ reg_page("training", "Pre-Forum Training · Google Hustle Academy", "Practical A
 
 reg_page("forum", "Main Forum · Rwanda Chamber of Tourism", "Rwanda Tourism Forum &amp; Awards 2026",
          "Main Forum registration. Friday 27 November 2026, Kigali.",
-         [("cal", "Friday, 27 November 2026"), ("pin", "Kigali, Rwanda"), ("users", "Around 400 participants")])
+         [("cal", "Friday, 27 November 2026"), ("pin", "Kigali, Rwanda")])
 
 
 # ---------- Admin ----------
