@@ -7,7 +7,7 @@
    the current browser and no emails are sent.
    ========================================================= */
 window.ORVIO = {
-  API_URL: "",
+  API_URL: "https://script.google.com/macros/s/AKfycbwTntVPUMXw2apjIe5zAIfyeMAD_P00VwFeR5FgRK3s6ZY5cSWxPrvADyKjlaAtkfkg/exec",
 
   event: {
     code: "RTFA2026",
