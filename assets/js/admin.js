@@ -276,7 +276,7 @@
   }
   function fileBase(ev) { return CFG.event.code + "_" + (ev === "forum" ? "Tourism-Forum-Awards" : "Hustle-Academy-Training") + "_" + new Date().toLocaleDateString("en-CA", { timeZone: TZ }); }
   function download(name, blob) { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
-  function toCSV(aoa) { return "﻿" + aoa.map(function (row) { return row.map(function (v) { v = String(v == null ? "" : v); return /[",\n;]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","); }).join("\r\n"); }
+  function toCSV(aoa) { return "﻿" + aoa.map(function (row) { return row.map(function (v) { v = String(v == null ? "" : v); if (/^[=+\-@\t\r]/.test(v) && !/^[+\-]?[\d\s().\-]+$/.test(v)) v = "'" + v; /* a value starting with = could run as a spreadsheet formula */ return /[",\n;]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","); }).join("\r\n"); }
   function withXLSX(cb) {
     if (window.XLSX) return cb();
     var s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"; s.onload = cb;
