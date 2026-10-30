@@ -48,9 +48,24 @@ def topbar(up, current=""):
 </div></header>"""
 
 
+PARTNERS = [
+    ("rha", "Rwanda Hospitality Association", 167, 158),
+    ("rtta", "Rwanda Tours and Travel Association", 178, 160),
+    ("rsga", "Rwanda Safari Guides Association", 453, 160),
+    ("rata", "Rwanda Association of Travel Agencies", 480, 144),
+    ("rhtea", "Rwanda Hospitality &amp; Tourism Educators Association", 175, 160),
+    ("rapco", "Rwanda Association of Professional Conference Organisers", 480, 152),
+    ("rcota", "Rwanda Community Tourism Association", 480, 118),
+]
+
+
 def footer(up, key=""):
     lead = "" if key == "training" else "Rwanda Tourism Forum &amp; Awards 2026 · "
-    return f"""<footer class="foot"><div class="wrap foot-inner">
+    logos = "".join(
+        f'<img src="{up}assets/img/partners/{n}.png" alt="{a}" title="{a}" width="{w}" height="{h}" loading="lazy">'
+        for n, a, w, h in PARTNERS)
+    return f"""<footer class="foot"><div class="wrap partner-logos" aria-label="Member associations">{logos}</div>
+<div class="wrap foot-inner">
 <span>{lead}Organised with Global Planners Ltd</span>
 <span class="powered">Registration by <strong>Orvio Systems</strong></span></div></footer>"""
 
@@ -81,7 +96,7 @@ def reg_page(key, kicker, title, lead, facts):
 <script src="{up}assets/js/schema.js"></script>
 <script src="{up}assets/js/forms.js"></script>
 <script>if(!window.ORVIO.API_URL){{document.getElementById('preview-flag').innerHTML='<div class="preview-flag"><strong>Preview</strong>This registration page is in preview mode. Registrations are kept in this browser only until the live system is connected.</div>';}}</script>"""
-    page(f"rtfa2026/{key}/index.html", f"{title} · Registration", lead, body, 2, f'<link rel="stylesheet" href="{up}assets/css/event.css">', scripts, "reg")
+    page(f"rtfa2026/{key}/index.html", f"{title} · Registration", lead, body, 2, f'<link rel="stylesheet" href="{up}assets/css/event.css?v=20261030">', scripts, "reg")
 
 
 reg_page("training", "", "Hustle Academy Training on Practical AI for Marketing",
@@ -112,6 +127,6 @@ landing = """<header class="topbar"><div class="wrap topbar-inner"><a class="hos
 </main>
 <footer class="foot"><div class="wrap foot-inner"><span>© 2026 Orvio Systems</span><span>orviosystems.si</span></div></footer>"""
 page("index.html", "Orvio Systems · Event registration & business systems", "Orvio Systems builds event registration platforms, dashboards and business systems.", landing, 0,
-     '<link rel="stylesheet" href="assets/css/event.css">')
+     '<link rel="stylesheet" href="assets/css/event.css?v=20261030">')
 
 print("pages built")

@@ -155,6 +155,9 @@ p { margin: 0 0 1em; }
 
 /* Footer */
 .foot { border-top: 1px solid var(--line); background: #fff; padding: 22px 0; font-size: 14px; color: var(--muted); }
+.partner-logos { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px 22px; padding: 4px 0 20px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+.partner-logos img { height: 48px; width: auto; max-width: 128px; object-fit: contain; }
+@media (max-width: 600px) { .partner-logos { gap: 14px 20px; } .partner-logos img { height: 38px; max-width: 110px; } }
 .foot-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
 .foot a { color: var(--muted); }
 .powered strong { color: var(--ink); }
