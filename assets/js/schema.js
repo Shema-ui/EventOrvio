@@ -5,15 +5,13 @@
   "use strict";
 
   var ASSOCIATIONS = [
-    "Rwanda Chamber of Tourism Association",
     "Rwanda Hospitality Association",
     "Rwanda Tours and Travel Association",
     "Rwanda Safari Guides Association",
     "Rwanda Association of Travel Agencies",
     "Rwanda Association of Professional Conference Organisers",
-    "Rwanda Community Based Tourism Association",
+    "Rwanda Community Tourism Association",
     "Rwanda Hospitality and Tourism Educators Association",
-    "Not a member of an association",
   ];
 
   var RWANDA = {
@@ -39,7 +37,7 @@
     { key: "job_title", label: "Position / job title", type: "text", required: true, autocomplete: "organization-title", half: true },
     { key: "department", label: "Department / unit", type: "text", required: true, placeholder: "e.g. Sales & Marketing" },
 
-    { section: "Contact information" },
+    { section: "Participant contact information" },
     { key: "phone", label: "Mobile telephone number", type: "tel", required: true, placeholder: "+250 7XX XXX XXX", autocomplete: "tel", half: true },
     { key: "phone_alt", label: "Alternative telephone number", type: "tel", required: false, placeholder: "+250 7XX XXX XXX", half: true },
     { key: "email", label: "Email address", type: "email", required: true, autocomplete: "email", help: "Your confirmation will be sent here." },

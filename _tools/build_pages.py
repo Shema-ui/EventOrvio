@@ -24,8 +24,8 @@ def page(path, title, desc, body, depth, extra_head="", scripts="", body_class="
 <meta name="description" content="{html.escape(desc)}">
 <meta property="og:title" content="{html.escape(title)}">
 <meta property="og:description" content="{html.escape(desc)}">
-<meta name="theme-color" content="#0d5b45">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%230d5b45'/%3E%3Cpath d='M0 22h32v10H0z' fill='%23e0a823'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#4a1128">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%234a1128'/%3E%3Cpath d='M0 22h32v10H0z' fill='%23f2b43e'/%3E%3C/svg%3E">
 {FONTS}
 {extra_head}
 </head>
@@ -41,9 +41,10 @@ def page(path, title, desc, body, depth, extra_head="", scripts="", body_class="
 
 
 def topbar(up, current=""):
-    sub = "" if current == "training" else "<small>Rwanda Tourism Forum &amp; Awards 2026</small>"
-    return f"""<header class="topbar"><div class="wrap topbar-inner">
-<span class="host"><span class="host-mark"><span>RCOT</span></span><span class="host-name">Rwanda Chamber of Tourism{sub}</span></span>
+    return f"""<header class="topbar"><div class="wrap logo-bar">
+<img src="{up}assets/img/rcot.png" alt="Rwanda Chamber of Tourism" width="493" height="219">
+<span class="logo-sep" aria-hidden="true"></span>
+<img class="logo-ict" src="{up}assets/img/ict-chamber.png" alt="ICT Chamber" width="597" height="600">
 </div></header>"""
 
 

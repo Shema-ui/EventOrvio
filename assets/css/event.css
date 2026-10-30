@@ -1,18 +1,18 @@
 /* Orvio Systems · event registration styles
-   Palette: RCOT-inspired tourism tones (Rwandan green, sun gold, lake blue) */
+   Palette: Rwanda Tourism Forum & Awards 2026 — deep burgundy and warm gold */
 :root {
-  --green: #0d5b45;
-  --green-deep: #073b2d;
-  --green-tint: #e7f1ec;
-  --gold: #e0a823;
-  --gold-soft: #fbf1d6;
-  --lake: #1c6fa8;
-  --ink: #14211c;
+  --green: #4a1128;
+  --green-deep: #2b0b17;
+  --green-tint: #f7e9ee;
+  --gold: #f2b43e;
+  --gold-soft: #fdf2db;
+  --lake: #a8325e;
+  --ink: #2b0b17;
   --text: #3a4742;
   --muted: #697570;
   --line: #dde4e0;
   --paper: #ffffff;
-  --sand: #f6f4ee;
+  --sand: #f8f4f1;
   --error: #b42318;
   --ok: #157347;
   --radius: 10px;
@@ -49,11 +49,11 @@ p { margin: 0 0 1em; }
 .top-links a:hover, .top-links a[aria-current="page"] { background: var(--green-tint); color: var(--green); }
 
 /* Hero */
-.hero { position: relative; color: #fff; background: var(--green-deep); overflow: hidden; isolation: isolate; }
+.hero { position: relative; color: #fff; background: linear-gradient(160deg, #4a1128 0%, #3a0d20 55%, #2b0b17 100%); overflow: hidden; isolation: isolate; }
 .hero::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: .5;
   background:
-    radial-gradient(60% 80% at 85% 10%, rgba(224,168,35,.35), transparent 60%),
-    radial-gradient(50% 70% at 10% 100%, rgba(28,111,168,.45), transparent 60%); }
+    radial-gradient(60% 80% at 85% 10%, rgba(242,180,62,.28), transparent 60%),
+    radial-gradient(50% 70% at 10% 100%, rgba(242,180,62,.12), transparent 60%); }
 .hills { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 70px; z-index: -1; }
 .hero-inner { padding: clamp(40px, 7vw, 76px) 0 clamp(64px, 9vw, 104px); }
 .hero h1 { color: #fff; max-width: 18ch; }
@@ -69,10 +69,10 @@ p { margin: 0 0 1em; }
 /* Event hub cards */
 .hub { margin-top: -48px; position: relative; z-index: 2; padding-bottom: 56px; }
 .hub-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-.session-card { background: #fff; border-radius: var(--radius); padding: 28px; box-shadow: 0 10px 30px rgba(7,59,45,.1); display: flex; flex-direction: column; gap: 6px; border-top: 5px solid var(--green); }
+.session-card { background: #fff; border-radius: var(--radius); padding: 28px; box-shadow: 0 10px 30px rgba(43,11,23,.1); display: flex; flex-direction: column; gap: 6px; border-top: 5px solid var(--green); }
 .session-card.is-training { border-top-color: var(--lake); }
 .session-card .tag { align-self: flex-start; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--green); background: var(--green-tint); padding: 5px 10px; border-radius: 999px; }
-.session-card.is-training .tag { color: var(--lake); background: #e6f0f8; }
+.session-card.is-training .tag { color: var(--lake); background: var(--green-tint); }
 .session-card h2 { margin-top: 10px; }
 .session-card .meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-weight: 700; color: var(--ink); font-size: 15px; }
 .session-card p { flex: 1; margin-top: 8px; }
@@ -85,14 +85,14 @@ p { margin: 0 0 1em; }
 .btn-primary { background: var(--green); color: #fff; }
 .btn-primary:hover { background: var(--green-deep); color: #fff; }
 .btn-gold { background: var(--gold); color: var(--ink); }
-.btn-gold:hover { background: #c99212; }
+.btn-gold:hover { background: #dc9c22; }
 .btn-ghost { background: #fff; color: var(--green); border-color: var(--line); }
 .btn-ghost:hover { border-color: var(--green); }
 .btn[disabled] { opacity: .6; cursor: progress; }
 
 /* Registration layout */
 .reg-layout { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 860px; gap: 16px; align-items: start; margin-top: -48px; position: relative; z-index: 2; padding-bottom: 64px; }
-.card { background: #fff; border-radius: var(--radius); box-shadow: 0 10px 30px rgba(7,59,45,.08); padding: clamp(20px, 3.5vw, 36px); }
+.card { background: #fff; border-radius: var(--radius); box-shadow: 0 10px 30px rgba(43,11,23,.08); padding: clamp(20px, 3.5vw, 36px); }
 .aside { position: sticky; top: 20px; display: grid; gap: 16px; }
 .aside h3 { margin-bottom: 8px; }
 .aside ul { margin: 0; padding-left: 18px; font-size: 15px; }
@@ -114,7 +114,7 @@ p { margin: 0 0 1em; }
   background: #fff; border: 1.5px solid #cfd8d3; border-radius: 8px; transition: border-color .15s, box-shadow .15s; }
 .field textarea { resize: vertical; min-height: 92px; }
 .field select:disabled { background: var(--sand); color: var(--muted); }
-.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(13,91,69,.15); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(74,17,40,.15); }
 .help { font-size: 13.5px; color: var(--muted); margin: 6px 0 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { position: relative; cursor: pointer; }
@@ -183,3 +183,10 @@ body.reg .eyebrow::after { content: ""; width: 22px; height: 2px; background: cu
 body.reg .facts { justify-content: center; }
 body.reg .reg-layout { max-width: none; }
 @media (max-width: 600px) { body.reg .eyebrow::before, body.reg .eyebrow::after { display: none; } body.reg .hero-inner { padding-bottom: 84px; } }
+
+/* Partner logos in the header */
+.logo-bar { display: flex; align-items: center; justify-content: center; gap: clamp(16px, 4vw, 32px); padding: 10px 0; }
+.logo-bar img { height: 56px; width: auto; object-fit: contain; }
+.logo-bar .logo-ict { height: 60px; }
+.logo-bar .logo-sep { width: 1px; height: 44px; background: var(--line); }
+@media (max-width: 600px) { .logo-bar img { height: 42px; } .logo-bar .logo-ict { height: 46px; } .logo-bar .logo-sep { height: 34px; } }
