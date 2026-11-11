@@ -5,6 +5,7 @@
   "use strict";
 
   var ASSOCIATIONS = [
+    "Rwanda Chamber of Tourism (RCOT)",
     "Rwanda Hospitality Association",
     "Rwanda Tours and Travel Association",
     "Rwanda Safari Guides Association",
