@@ -23,6 +23,12 @@
     "Western Province": ["Karongi", "Ngororero", "Nyabihu", "Nyamasheke", "Rubavu", "Rusizi", "Rutsiro"],
   };
 
+  // Main forum form: "Participant category" dropdown. The member associations
+  // come from the training list above (without RCOT, which has its own line here).
+  var FORUM_CATEGORIES = ["Speaker / Panelist", "Rwanda Chamber of Tourism"]
+    .concat(ASSOCIATIONS.filter(function (a) { return a.indexOf("Rwanda Chamber of Tourism") !== 0; }))
+    .concat(["Member of ICT Chamber", "Delegate", "Development Partner", "Media", "Government / Public Institution", "RCOT Secretariat"]);
+
   var CONSENT = "I agree that the organisers may use my details to manage this registration, send event information and issue my certificate.";
 
   var training = [
@@ -67,7 +73,7 @@
     { key: "full_name", label: "Full name", type: "text", required: true, autocomplete: "name", half: true },
     { key: "job_title", label: "Position / job title", type: "text", required: true, autocomplete: "organization-title", half: true },
     { key: "organisation", label: "Organisation", type: "text", required: true, autocomplete: "organization" },
-    { key: "category", label: "Participant category", type: "select", required: true, options: ["Speaker / Panelist", "All Associations", "Rwanda Chamber of Tourism", "Member of ICT Chamber", "Delegate", "Development Partner", "Media", "Government / Public Institution", "RCOT Secretariat"] },
+    { key: "category", label: "Participant category", type: "select", required: true, options: FORUM_CATEGORIES },
 
     { section: "Contact details" },
     { key: "email", label: "Email address", type: "email", required: true, autocomplete: "email", half: true, help: "Your confirmation will be sent here." },
