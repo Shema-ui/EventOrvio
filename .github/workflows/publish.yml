@@ -1,0 +1,23 @@
+# Publishes the site (GitHub Pages) after every change to main.
+# Needed because changes saved by some tools don't start the Pages build on their own.
+name: Publish site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask GitHub Pages to rebuild
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" --jq '.status' || {
+            echo "::warning::Could not request a Pages build. Check Settings → Pages."; exit 1; }
