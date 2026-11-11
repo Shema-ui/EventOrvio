@@ -66,7 +66,7 @@
     { key: "full_name", label: "Full name", type: "text", required: true, autocomplete: "name", half: true },
     { key: "job_title", label: "Position / job title", type: "text", required: true, autocomplete: "organization-title", half: true },
     { key: "organisation", label: "Organisation", type: "text", required: true, autocomplete: "organization" },
-    { key: "category", label: "Participant category", type: "select", required: true, options: ["Delegate", "Speaker / Panelist", "Exhibitor", "Sponsor / Partner", "Award Nominee", "Government / Public Institution", "Development Partner", "Media", "Student", "Other"] },
+    { key: "category", label: "Participant category", type: "select", required: true, options: ["Speaker / Panelist", "All Associations", "Rwanda Chamber of Tourism", "Member of ICT Chamber", "Delegate", "Development Partner", "Media", "Government / Public Institution", "RCOT Secretariat"] },
 
     { section: "Contact details" },
     { key: "email", label: "Email address", type: "email", required: true, autocomplete: "email", half: true, help: "Your confirmation will be sent here." },
