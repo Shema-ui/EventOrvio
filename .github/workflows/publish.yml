@@ -1,5 +1,5 @@
-# Publishes the site (GitHub Pages) after every change to main.
-# Needed because changes saved by some tools don't start the Pages build on their own.
+# The live site (GitHub Pages) is published from the gh-pages branch.
+# After every change to main, this copies main to gh-pages and asks Pages to rebuild.
 name: Publish site
 
 on:
@@ -9,15 +9,18 @@ on:
 
 permissions:
   pages: write
-  contents: read
+  contents: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Copy main to gh-pages
+        run: git push --force origin HEAD:gh-pages
       - name: Ask GitHub Pages to rebuild
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh api -X POST "repos/${{ github.repository }}/pages/builds" --jq '.status' || {
-            echo "::warning::Could not request a Pages build. Check Settings → Pages."; exit 1; }
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" --jq '.status'
