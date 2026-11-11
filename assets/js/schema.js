@@ -4,14 +4,18 @@
 (function () {
   "use strict";
 
+  // Training form: "Participant category" dropdown (key stays `association`
+  // so earlier registrations and the dashboard keep working).
   var ASSOCIATIONS = [
-    "Rwanda Hospitality Association",
-    "Rwanda Tours and Travel Association",
-    "Rwanda Safari Guides Association",
-    "Rwanda Association of Travel Agencies",
-    "Rwanda Association of Professional Conference Organisers",
-    "Rwanda Community Tourism Association",
-    "Rwanda Hospitality and Tourism Educators Association",
+    "Speaker / Panelist",
+    "All Associations",
+    "Rwanda Chamber of Tourism",
+    "Member of ICT Chamber",
+    "Delegate",
+    "Development Partner",
+    "Media",
+    "Government / Public Institution",
+    "RCOT Secretariat",
   ];
 
   var RWANDA = {
@@ -25,8 +29,8 @@
   var CONSENT = "I agree that the organisers may use my details to manage this registration, send event information and issue my certificate.";
 
   var training = [
-    { section: "Membership & organisation" },
-    { key: "association", label: "Association membership", type: "select", required: true, options: ASSOCIATIONS, help: "Which RCOT member association do you belong to?" },
+    { section: "Category & organisation" },
+    { key: "association", label: "Participant category", type: "select", required: true, options: ASSOCIATIONS, help: "Choose the one that best describes you." },
     { key: "organisation", label: "Business / organisation name", type: "text", required: true, placeholder: "e.g. Kivu Lodge Ltd" },
 
     { section: "Participant information" },
