@@ -164,9 +164,9 @@
     } else {
       html += '<div class="stats">' +
         stat("Total registrations", total, "Current registrations · archived records excluded", "users") +
-        stat("Categories represented", distinct(rows.filter(function (r) { return r.association; }), "association"), "Participant categories taking part", "layers") +
+        stat("Associations represented", distinct(rows.filter(function (r) { return r.association && r.association.indexOf("Not a member") !== 0; }), "association"), "RCOT member associations taking part", "layers") +
         stat("Certificates to issue", rows.filter(function (r) { return r.certificate_name; }).length, "Names confirmed for certificates", "award", true) + "</div>" +
-        '<div class="duo">' + breakdown("Who's joining", "Registrations by category", "users", countBy(rows, "association"), total) +
+        '<div class="duo">' + breakdown("Who's joining", "Registrations by association", "users", countBy(rows, "association"), total) +
         breakdown("Where we're connecting", "Registrations by province", "map", countBy(rows, "province"), total) + "</div>";
     }
     var days = {}; rows.forEach(function (r) { var k = dayKey(r.timestamp); if (k) days[k] = (days[k] || 0) + 1; });
@@ -185,7 +185,7 @@
     var filterOpts = countBy(active(cache[ev] || []), filterKey).map(function (x) { return x[0]; });
     view.innerHTML = head(title, "Registrations", ev) +
       '<div class="toolbar"><label class="search">' + ic("search") + '<span class="visually-hidden">Search</span><input id="q" type="search" placeholder="Search name, email, organisation, reference…" value="' + esc(tableState.q) + '"></label>' +
-      '<select id="flt" aria-label="Filter"><option value="">All ' + "categories" + "</option>" + filterOpts.map(function (o) { return "<option" + (o === tableState.filter ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>" +
+      '<select id="flt" aria-label="Filter"><option value="">All ' + (ev === "forum" ? "categories" : "associations") + "</option>" + filterOpts.map(function (o) { return "<option" + (o === tableState.filter ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>" +
       '<label class="check-inline"><input type="checkbox" id="arch"' + (tableState.archived ? " checked" : "") + "> Show archived</label>" +
       '<button class="btn btn-line" id="csv">' + ic("download") + "CSV</button>" +
       '<button class="btn btn-primary" id="xlsx">' + ic("download") + "Excel</button>" +
@@ -202,7 +202,7 @@
       });
       var cols = ev === "forum"
         ? [["Ref", "ref"], ["Name", "full_name"], ["Organisation", "organisation"], ["Category", "category"], ["Country", "country"], ["Phone", "phone"], ["Registered", "timestamp"]]
-        : [["Ref", "ref"], ["Name", "full_name"], ["Organisation", "organisation"], ["Category", "association"], ["Certificate name", "certificate_name"], ["Phone", "phone"], ["Registered", "timestamp"]];
+        : [["Ref", "ref"], ["Name", "full_name"], ["Organisation", "organisation"], ["Association", "association"], ["Certificate name", "certificate_name"], ["Phone", "phone"], ["Registered", "timestamp"]];
       var html = '<div class="table-wrap"><table><thead><tr>' + cols.map(function (c) { return '<th scope="col">' + c[0] + "</th>"; }).join("") + "</tr></thead><tbody>";
       if (!rows.length) html += '<tr><td colspan="' + cols.length + '" class="empty">No registrations match.</td></tr>';
       rows.forEach(function (r) {
