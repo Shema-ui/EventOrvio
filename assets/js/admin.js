@@ -6,7 +6,8 @@
   var KEY_STORE = "orvio_admin_key", ROLE_STORE = "orvio_admin_role";
   var TZ = "Africa/Kigali";
   var app = document.getElementById("app");
-  var cache = { training: null, forum: null }, lastSync = null, timer = null;
+  var cache = { training: null, forum: null, gala: null }, lastSync = null, timer = null;
+  var TITLES = { forum: "Rwanda Tourism Forum & Awards 2026", training: "Hustle Academy Training on Practical AI for Marketing", gala: "Gala Dinner · Rwanda Tourism Forum & Awards 2026" };
 
   /* ---------- helpers ---------- */
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -101,6 +102,7 @@
   var NAV = [
     { ev: "forum", title: "Tourism Forum & Awards" },
     { ev: "training", title: "Hustle Academy Training" },
+    { ev: "gala", title: "Gala Dinner" },
   ];
   function shell(ev, view) {
     var nav = NAV.map(function (n) {
@@ -114,7 +116,7 @@
       '<div class="side-foot"><button type="button" id="signout">' + ic("out") + "Sign out</button></div></aside>" +
       '<main class="main" id="main"><button class="menu-btn" id="menu" aria-expanded="false" aria-controls="side">' + ic("menu") + "Menu</button><div id='view'></div></main></div>" +
       '<div class="drawer" id="drawer" hidden><div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="dr-title" id="drawer-panel"></div></div>';
-    document.getElementById("signout").addEventListener("click", function () { setKey(""); cache = { training: null, forum: null }; clearInterval(timer); location.hash = ""; renderLogin(); });
+    document.getElementById("signout").addEventListener("click", function () { setKey(""); cache = { training: null, forum: null, gala: null }; clearInterval(timer); location.hash = ""; renderLogin(); });
     var side = document.getElementById("side"), menu = document.getElementById("menu");
     menu.addEventListener("click", function () { var o = side.classList.toggle("is-open"); menu.setAttribute("aria-expanded", o); });
     side.addEventListener("click", function (e) { if (e.target.closest("a")) side.classList.remove("is-open"); });
@@ -152,9 +154,9 @@
   /* ---------- dashboard ---------- */
   function dashboard(ev) {
     var view = shell(ev, "dashboard"), rows = active(cache[ev] || []), total = rows.length, html;
-    var title = ev === "forum" ? "Rwanda Tourism Forum & Awards 2026" : "Hustle Academy Training on Practical AI for Marketing";
+    var title = TITLES[ev];
     html = head(title, "Dashboard", ev);
-    if (ev === "forum") {
+    if (ev !== "training") {
       html += '<div class="stats">' +
         stat("Total registrations", total, "Current registrations · archived records excluded", "users") +
         stat("Countries represented", distinct(rows, "country"), "Connecting people across borders", "globe") +
@@ -180,12 +182,12 @@
   var tableState = { q: "", archived: false, filter: "" };
   function registrations(ev) {
     var view = shell(ev, "registrations");
-    var title = ev === "forum" ? "Rwanda Tourism Forum & Awards 2026" : "Hustle Academy Training on Practical AI for Marketing";
-    var filterKey = ev === "forum" ? "category" : "association";
+    var title = TITLES[ev];
+    var filterKey = ev !== "training" ? "category" : "association";
     var filterOpts = countBy(active(cache[ev] || []), filterKey).map(function (x) { return x[0]; });
     view.innerHTML = head(title, "Registrations", ev) +
       '<div class="toolbar"><label class="search">' + ic("search") + '<span class="visually-hidden">Search</span><input id="q" type="search" placeholder="Search name, email, organisation, reference…" value="' + esc(tableState.q) + '"></label>' +
-      '<select id="flt" aria-label="Filter"><option value="">All ' + (ev === "forum" ? "categories" : "associations") + "</option>" + filterOpts.map(function (o) { return "<option" + (o === tableState.filter ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>" +
+      '<select id="flt" aria-label="Filter"><option value="">All ' + (ev !== "training" ? "categories" : "associations") + "</option>" + filterOpts.map(function (o) { return "<option" + (o === tableState.filter ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>" +
       '<label class="check-inline"><input type="checkbox" id="arch"' + (tableState.archived ? " checked" : "") + "> Show archived</label>" +
       '<button class="btn btn-line" id="csv">' + ic("download") + "CSV</button>" +
       '<button class="btn btn-primary" id="xlsx">' + ic("download") + "Excel</button>" +
@@ -200,7 +202,7 @@
         var hay = [r.ref, r.full_name, r.email, r.organisation, r.phone, r.category, r.association, r.certificate_name].join(" ").toLowerCase();
         return hay.indexOf(tableState.q.toLowerCase()) >= 0;
       });
-      var cols = ev === "forum"
+      var cols = ev !== "training"
         ? [["Ref", "ref"], ["Name", "full_name"], ["Organisation", "organisation"], ["Category", "category"], ["Country", "country"], ["Phone", "phone"], ["Registered", "timestamp"]]
         : [["Ref", "ref"], ["Name", "full_name"], ["Organisation", "organisation"], ["Association", "association"], ["Certificate name", "certificate_name"], ["Phone", "phone"], ["Registered", "timestamp"]];
       var html = '<div class="table-wrap"><table><thead><tr>' + cols.map(function (c) { return '<th scope="col">' + c[0] + "</th>"; }).join("") + "</tr></thead><tbody>";
@@ -274,7 +276,7 @@
     var rows = active(cache[ev] || []).map(function (r) { return [r.ref, fmtDate(r.timestamp, true)].concat(keys.map(function (k) { return r[k] == null ? "" : String(r[k]); })); });
     return [header].concat(rows);
   }
-  function fileBase(ev) { return CFG.event.code + "_" + (ev === "forum" ? "Tourism-Forum-Awards" : "Hustle-Academy-Training") + "_" + new Date().toLocaleDateString("en-CA", { timeZone: TZ }); }
+  function fileBase(ev) { return CFG.event.code + "_" + { forum: "Tourism-Forum-Awards", training: "Hustle-Academy-Training", gala: "Gala-Dinner" }[ev] + "_" + new Date().toLocaleDateString("en-CA", { timeZone: TZ }); }
   function download(name, blob) { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
   function toCSV(aoa) { return "﻿" + aoa.map(function (row) { return row.map(function (v) { v = String(v == null ? "" : v); if (/^[=+\-@\t\r]/.test(v) && !/^[+\-]?[\d\s().\-]+$/.test(v)) v = "'" + v; /* a value starting with = could run as a spreadsheet formula */ return /[",\n;]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","); }).join("\r\n"); }
   function withXLSX(cb) {
@@ -291,7 +293,7 @@
       var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheet); XLSX.writeFile(wb, name + ".xlsx");
     });
   }
-  function exportRows(ev, fmt) { saveAoa(exportTable(ev), fileBase(ev), ev === "forum" ? "Tourism Forum and Awards" : "Hustle Academy Training", fmt); }
+  function exportRows(ev, fmt) { saveAoa(exportTable(ev), fileBase(ev), { forum: "Tourism Forum and Awards", training: "Hustle Academy Training", gala: "Gala Dinner" }[ev], fmt); }
   function exportCerts() {
     var rows = active(cache.training || []).slice().sort(function (a, b) { return (a.certificate_name || "").localeCompare(b.certificate_name || ""); });
     var aoa = [["No.", "Name on certificate", "Full name", "Organisation", "Email", "Reference"]].concat(rows.map(function (r, i) { return [i + 1, r.certificate_name, r.full_name, r.organisation, r.email, r.ref]; }));
@@ -308,8 +310,9 @@
     var names = [["Aline Uwase", "Kivu Lodge Ltd"], ["Eric Mugisha", "Volcano Trails"], ["Grace Ingabire", "Kigali Heights Hotel"], ["Jean Bosco Habimana", "Akagera Safaris"], ["Diane Mukamana", "Nyungwe Eco Tours"], ["Patrick Niyonzima", "Lake Kivu Boats"]];
     var rows = previewLoad(ev), now = Date.now();
     names.forEach(function (n, i) {
-      var base = { ref: (ev === "forum" ? "RTF" : "TRN") + "-SMP" + i + Math.floor(Math.random() * 9), timestamp: new Date(now - i * 26 * 3600e3).toISOString(), full_name: n[0] + " (sample)", organisation: n[1], email: "sample" + i + "@example.com", phone: "+250 78" + (1000000 + i * 1234567).toString().slice(0, 7), sample: true };
-      if (ev === "forum") Object.assign(base, { job_title: ["Managing Director", "Marketing Manager", "Operations Lead"][i % 3], category: ["Delegate", "Exhibitor", "Award Nominee", "Delegate", "Media", "Sponsor / Partner"][i], country: ["Rwanda", "Rwanda", "Uganda", "Kenya", "Rwanda", "Tanzania"][i], consent: "Yes" });
+      var catOpts = (S[ev] || []).filter(function (f) { return f.key === "category"; }).map(function (f) { return f.options; })[0] || [];
+      var base = { ref: CFG.sessions[ev].refPrefix + "-SMP" + i + Math.floor(Math.random() * 9), timestamp: new Date(now - i * 26 * 3600e3).toISOString(), full_name: n[0] + " (sample)", organisation: n[1], email: "sample" + i + "@example.com", phone: "+250 78" + (1000000 + i * 1234567).toString().slice(0, 7), sample: true };
+      if (ev !== "training") Object.assign(base, { job_title: ["Managing Director", "Marketing Manager", "Operations Lead"][i % 3], category: catOpts[i % catOpts.length], country: ["Rwanda", "Rwanda", "Uganda", "Kenya", "Rwanda", "Tanzania"][i], consent: "Yes" });
       else Object.assign(base, { association: S.training[1].options[i % S.training[1].options.length], gender: i % 2 ? "Male" : "Female", age_group: ["25–34", "35–44", "25–34", "45–54", "18–24", "35–44"][i], job_title: "Marketing Officer", department: "Sales & Marketing", province: ["Kigali City", "Western Province", "Kigali City", "Eastern Province", "Southern Province", "Western Province"][i], district: ["Gasabo", "Rubavu", "Kicukiro", "Kayonza", "Huye", "Karongi"][i], sector: "Sample sector", marketing_role: ["Directly responsible", "Partially responsible", "Directly responsible", "Directly responsible", "Partially responsible", "Not currently responsible"][i], certificate_name: n[0], objective: "Use AI to plan campaigns", expected_skills: "Content creation with AI tools", consent: "Yes" });
       rows.push(base);
     });
@@ -317,7 +320,7 @@
   }
 
   /* ---------- routing & polling ---------- */
-  function parse() { var m = location.hash.match(/^#\/(forum|training)\/(dashboard|registrations)$/); return m ? { ev: m[1], view: m[2] } : { ev: "forum", view: "dashboard" }; }
+  function parse() { var m = location.hash.match(/^#\/(forum|training|gala)\/(dashboard|registrations)$/); return m ? { ev: m[1], view: m[2] } : { ev: "forum", view: "dashboard" }; }
   function render() { var p = parse(); (p.view === "dashboard" ? dashboard : registrations)(p.ev); }
   function route() {
     if (!getKey()) { renderLogin(); return; }

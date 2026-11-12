@@ -43,6 +43,14 @@ const EVENTS = {
     date: '27th Nov 2026',
     where: 'Kigali, Rwanda',
   },
+  gala: {
+    sheet: 'Gala Dinner',
+    prefix: 'GLA',
+    title: 'Gala Dinner · Rwanda Tourism Forum & Awards 2026',
+    subtitle: '',
+    date: '27th Nov 2026',
+    where: 'Kigali, Rwanda',
+  },
 };
 
 const FIXED = ['Reference', 'Registered at (UTC)', 'Archived'];
@@ -269,7 +277,7 @@ function sendConfirmation(eventKey, ev, d, ref, updated) {
   const first = String(d.full_name).split(' ')[0];
   const rows = [['Reference', ref], ['Name', d.full_name], ['Organisation', d.organisation], ['Email', d.email], ['Phone', d.phone]];
   if (eventKey === 'training') rows.push(['Name on certificate', d.certificate_name]);
-  if (eventKey === 'forum') rows.push(['Category', d.category]);
+  if (eventKey !== 'training') rows.push(['Category', d.category]);
 
   const table = rows.filter(function (r) { return r[1]; }).map(function (r) {
     return '<tr><td style="padding:8px 0;color:#697570;width:170px;border-bottom:1px solid #e3e9e5">' + esc(r[0]) +

@@ -29,7 +29,17 @@
     .concat(ASSOCIATIONS.filter(function (a) { return a.indexOf("Rwanda Chamber of Tourism") !== 0; }))
     .concat(["Member of ICT Chamber", "Delegate", "Development Partner", "Media", "Government / Public Institution", "RCOT Secretariat"]);
 
-  var CONSENT = "I agree that the organisers may use my details to manage this registration, send event information and issue my certificate.";
+  // Gala dinner form: the same fields as the main forum form, with its own categories.
+  var GALA_CATEGORIES = [
+    "All RCOT Associations",
+    "RCOT Secretariat",
+    "Member of the ICT Chamber",
+    "GoR Institution / Public Institution",
+    "Delegate",
+    "Exhibitor",
+  ];
+
+  var CONSENT ="I agree that the organisers may use my details to manage this registration, send event information and issue my certificate.";
 
   var training = [
     { section: "Membership & organisation" },
@@ -84,5 +94,13 @@
     { key: "consent", label: "I agree that the organisers may use my details to manage this registration and send me event information.", type: "consent", required: true },
   ];
 
-  window.ORVIO_SCHEMA = { training: training, forum: forum, RWANDA: RWANDA };
+  var gala = forum.map(function (f) {
+    if (f.key !== "category") return f;
+    var copy = {};
+    Object.keys(f).forEach(function (k) { copy[k] = f[k]; });
+    copy.options = GALA_CATEGORIES;
+    return copy;
+  });
+
+  window.ORVIO_SCHEMA = { training: training, forum: forum, gala: gala, RWANDA: RWANDA };
 })();

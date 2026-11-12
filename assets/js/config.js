@@ -39,5 +39,15 @@ window.ORVIO = {
       blurb: "Rwanda Tourism Forum & Awards 2026, 27th Nov 2026. Kigali.",
       refPrefix: "RTF",
     },
+    gala: {
+      title: "Gala Dinner · Rwanda Tourism Forum & Awards 2026",
+      kicker: "Gala Dinner",
+      partner: "Rwanda Chamber of Tourism",
+      date: "27th Nov 2026",
+      dateISO: "2026-11-27",
+      format: "In person · Kigali",
+      blurb: "Gala Dinner of the Rwanda Tourism Forum & Awards 2026, 27th Nov 2026. Kigali.",
+      refPrefix: "GLA",
+    },
   },
 };
