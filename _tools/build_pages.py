@@ -103,8 +103,12 @@ reg_page("training", "", "Hustle Academy Training on Practical AI for Marketing"
          "Hustle Academy Training on Practical AI for Marketing, 26th Nov 2026, online.",
          [("cal", "26th Nov 2026"), ("screen", "Online · 1–2 hours")])
 
-reg_page("forum", "", "Rwanda Tourism Forum &amp; Awards 2026",
+reg_page("forum", "", "Rwanda Tourism Forum & Awards 2026",
          "Rwanda Tourism Forum & Awards 2026, 27th Nov 2026, Kigali.",
+         [("cal", "27th Nov 2026"), ("pin", "Kigali, Rwanda")])
+
+reg_page("gala", "", "Gala Dinner · Rwanda Tourism Forum & Awards 2026",
+         "Gala Dinner of the Rwanda Tourism Forum & Awards 2026, 27th Nov 2026, Kigali.",
          [("cal", "27th Nov 2026"), ("pin", "Kigali, Rwanda")])
 
 
