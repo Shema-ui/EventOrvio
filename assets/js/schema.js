@@ -31,6 +31,7 @@
 
   // Gala dinner form: the same fields as the main forum form, with its own categories.
   var GALA_CATEGORIES = [
+    "Rwanda Chamber of Tourism",
     "Rwanda Hospitality Association",
     "Rwanda Tours and Travel Association",
     "Rwanda Safari Guides Association",
