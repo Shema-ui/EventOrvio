@@ -50,7 +50,7 @@
 
   var training = [
     { section: "Membership & organisation" },
-    { key: "association", label: "Association membership", type: "select", required: true, options: ASSOCIATIONS, help: "Which RCOT member association do you belong to?" },
+    { key: "association", label: "Association membership", type: "select", required: true, options: ASSOCIATIONS.concat(["Other"]), help: "Which RCOT member association do you belong to?" },
     { key: "organisation", label: "Business / organisation name", type: "text", required: true, placeholder: "e.g. Kivu Lodge Ltd" },
 
     { section: "Participant information" },
