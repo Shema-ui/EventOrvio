@@ -66,6 +66,7 @@ function doPost(e) {
     if (body.action === 'register') return json(register(body));
     if (body.action === 'archive') return json(archive(body));
     if (body.action === 'delete') return json(remove(body));
+    if (body.action === 'review') return json(review(body));
     return json({ ok: false, error: 'Unknown action' });
   } catch (err) {
     return json({ ok: false, error: String(err && err.message || err) });
@@ -109,10 +110,12 @@ function register(body) {
   const now = new Date().toISOString();
   data.updated_at = '';
   labels.updated_at = 'Last updated (UTC)';
+  data.status = 'pending';
+  labels.status = 'Status';
 
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
-  let ref, updated = false;
+  let ref, updated = false, wasStatus = '';
   try {
     const sheet = getSheet(ev.sheet);
     const keys = ensureColumns(sheet, data, labels);
@@ -134,9 +137,12 @@ function register(body) {
       const old = sheet.getRange(rowNum, 1, 1, keys.length).getValues()[0];
       ref = old[0];
       updated = true;
+      const si = keys.indexOf('status');
+      wasStatus = si >= 0 ? (String(old[si] || '') || 'approved') : 'approved';
       data.updated_at = now;
       const row = keys.map(function (k, i) {
         if (k === 'ref' || k === 'timestamp' || k === 'archived') return old[i];
+        if (k === 'status') return wasStatus === 'approved' ? 'approved' : 'pending';
         return k in data ? clean(data[k]) : old[i];
       });
       sheet.getRange(rowNum, 1, 1, keys.length).setValues([row]);
@@ -146,6 +152,7 @@ function register(body) {
         if (k === 'ref') return ref;
         if (k === 'timestamp') return now;
         if (k === 'archived') return '';
+        if (k === 'status') return 'pending';
         return clean(data[k]);
       });
       sheet.appendRow(row);
@@ -154,8 +161,13 @@ function register(body) {
     lock.releaseLock();
   }
 
-  try { sendConfirmation(body.event, ev, data, ref, updated); } catch (err) { console.error('Email failed', err); }
-  return { ok: true, ref: ref, updated: updated };
+  // Only someone already approved gets a fresh confirmation; everyone else waits for approval.
+  const approved = updated && wasStatus === 'approved';
+  try {
+    if (approved) sendConfirmation(body.event, ev, data, ref, true);
+    else sendReceived(ev, data, ref);
+  } catch (err) { console.error('Email failed', err); }
+  return { ok: true, ref: ref, updated: updated, status: approved ? 'approved' : 'pending' };
 }
 
 // Next reference number, safe even after rows have been deleted.
@@ -311,6 +323,87 @@ function sendConfirmation(eventKey, ev, d, ref, updated) {
 }
 
 /* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
+/* Approval                                                            */
+/* ------------------------------------------------------------------ */
+
+// Admin approves or rejects registrations (refs). Approving sends the confirmation email.
+function review(body) {
+  if (!role(body.key)) return { ok: false, error: 'Invalid access key' };
+  const ev = EVENTS[body.event];
+  if (!ev) return { ok: false, error: 'Unknown event' };
+  if (['approved', 'rejected', 'pending'].indexOf(body.decision) < 0) return { ok: false, error: 'Unknown decision' };
+  const refs = Array.isArray(body.refs) ? body.refs.map(String) : [String(body.ref || '')];
+  const changed = [];
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const sheet = getSheet(ev.sheet);
+    const last = sheet.getLastRow();
+    if (last < 3) return { ok: false, error: 'Not found' };
+    const width = sheet.getLastColumn();
+    const keys = sheet.getRange(2, 1, 1, width).getValues()[0].map(String);
+    const statusCol = keys.indexOf('status');
+    if (statusCol < 0) return { ok: false, error: 'Not found' };
+    const values = sheet.getRange(3, 1, last - 2, width).getValues();
+    values.forEach(function (row, i) {
+      const ref = String(row[0]);
+      if (refs.indexOf(ref) < 0) return;
+      const was = String(row[statusCol] || '') || 'approved';   // blank = registered before approval existed
+      if (was === body.decision) return;
+      sheet.getRange(i + 3, statusCol + 1).setValue(body.decision);
+      const d = {};
+      keys.forEach(function (k, j) { d[k] = String(row[j] == null ? '' : row[j]).replace(/^'/, ''); });
+      changed.push({ d: d, ref: ref });
+    });
+  } finally {
+    lock.releaseLock();
+  }
+  changed.forEach(function (c) {
+    try {
+      if (body.decision === 'approved') sendConfirmation(body.event, ev, c.d, c.ref, false);
+      else if (body.decision === 'rejected' && body.notify) sendRejected(ev, c.d, c.ref);
+    } catch (err) { console.error('Email failed', err); }
+  });
+  return { ok: true, changed: changed.length };
+}
+
+function sendBranded(ev, to, subject, bodyHtml) {
+  const html =
+    '<div style="background:#f6f4ee;padding:24px 12px;font-family:Arial,Helvetica,sans-serif">' +
+    '<div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:10px;overflow:hidden">' +
+    '<div style="background:#0d5b45;padding:24px 28px;color:#ffffff">' +
+    '<div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#e0a823;font-weight:bold">' + esc(HOST_NAME) + '</div>' +
+    '<div style="font-size:22px;font-weight:bold;margin-top:6px">' + esc(ev.title) + '</div></div>' +
+    '<div style="height:6px;background:#e0a823"></div>' +
+    '<div style="padding:26px 28px;color:#3a4742;font-size:15px;line-height:1.6">' + bodyHtml + '</div>' +
+    '<div style="padding:14px 28px;background:#f6f4ee;color:#697570;font-size:12px">Registration powered by Orvio Systems</div>' +
+    '</div></div>';
+  const options = { to: to, subject: subject, htmlBody: html, name: SENDER_NAME };
+  if (REPLY_TO) options.replyTo = REPLY_TO;
+  MailApp.sendEmail(options);
+}
+
+// Sent straight after registering: received, not yet confirmed.
+function sendReceived(ev, d, ref) {
+  const first = String(d.full_name).split(' ')[0];
+  sendBranded(ev, d.email, 'Application received: ' + ev.title + ' (' + ref + ')',
+    '<p style="margin:0 0 14px">Dear ' + esc(first) + ',</p>' +
+    '<p style="margin:0 0 14px">Thank you for registering. We have received your application, reference <strong>' + esc(ref) + '</strong>.</p>' +
+    '<p style="margin:0 0 14px">Our team will review it. Once it is approved you will receive a confirmation email with your place and details. You do not need to do anything else for now.</p>' +
+    '<p style="margin:18px 0 0">Thank you,<br>' + esc(EVENT_NAME) + ' team</p>');
+}
+
+// Only sent when the admin ticks "Email them if rejected".
+function sendRejected(ev, d, ref) {
+  const first = String(d.full_name).split(' ')[0];
+  sendBranded(ev, d.email, 'Registration update: ' + ev.title + ' (' + ref + ')',
+    '<p style="margin:0 0 14px">Dear ' + esc(first) + ',</p>' +
+    '<p style="margin:0 0 14px">Thank you for your interest in ' + esc(ev.title) + '. Unfortunately we are unable to confirm your registration (reference <strong>' + esc(ref) + '</strong>) at this time.</p>' +
+    '<p style="margin:0 0 14px">If you have questions, please reply to this email.</p>' +
+    '<p style="margin:18px 0 0">Thank you,<br>' + esc(EVENT_NAME) + ' team</p>');
+}
 
 function json(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);

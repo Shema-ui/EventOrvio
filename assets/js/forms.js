@@ -189,11 +189,11 @@
     card.innerHTML =
       '<div class="success" tabindex="-1">' +
       '<div class="success-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>' +
-      "<h2>" + (res.updated ? "Registration updated" : "You're registered") + "</h2>" +
-      "<p>" + (res.updated ? "This email address was already registered, so we've replaced your earlier details with the ones below. Your reference number stays the same." : "Thank you, " + esc((data.full_name || "").split(" ")[0]) + ". Your place for <strong>" + esc(session.title) + "</strong> is confirmed.") + "</p>" +
+      "<h2>" + (res.status === "pending" ? (res.updated ? "Application updated" : "Application received") : (res.updated ? "Registration updated" : "You're registered")) + "</h2>" +
+      "<p>" + (res.updated ? "This email address was already registered, so we've replaced your earlier details with the ones below. Your reference number stays the same." : res.status === "pending" ? "Thank you, " + esc((data.full_name || "").split(" ")[0]) + ". We have received your registration for <strong>" + esc(session.title) + "</strong>. The organisers will review it, and you will get a confirmation email once it is approved." : "Thank you, " + esc((data.full_name || "").split(" ")[0]) + ". Your place for <strong>" + esc(session.title) + "</strong> is confirmed.") + "</p>" +
       '<p class="ref">Reference <strong>' + esc(res.ref) + "</strong></p>" +
       '<dl class="summary">' + rows.map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1] || "–") + "</dd></div>"; }).join("") + "</dl>" +
-      "<p class=\"small\">" + (PREVIEW ? "Preview mode: in the live system a confirmation email is sent to " + esc(data.email) + "." : (res.updated ? "An updated confirmation email has been sent to " : "A confirmation email has been sent to ") + esc(data.email) + ". Check your spam folder if it doesn't arrive within a few minutes.") + "</p>" +
+      "<p class=\"small\">" + (PREVIEW ? "Preview mode: in the live system a confirmation email is sent to " + esc(data.email) + "." : (res.status === "pending" ? "A receipt has been sent to " : res.updated ? "An updated confirmation email has been sent to " : "A confirmation email has been sent to ") + esc(data.email) + ". Check your spam folder if it doesn't arrive within a few minutes.") + "</p>" +
       '<div class="success-actions"><a class="btn btn-primary" href="' + ics() + '" download="' + eventKey + '-' + CFG.event.code + '.ics">Add to calendar</a><a class="btn btn-ghost" href="./">Register someone else</a></div>' +
       "</div>";
     var s = card.querySelector(".success"); s.focus(); card.scrollIntoView({ behavior: "smooth", block: "start" });
