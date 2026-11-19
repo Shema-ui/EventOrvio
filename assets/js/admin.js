@@ -75,6 +75,14 @@
     }
     return apiPost({ action: "review", key: getKey(), event: ev, refs: refs, decision: decision, notify: !!notify }).then(function (res) { if (!res.ok) throw new Error(res.error); });
   }
+  function approvalStats(rows) {
+    var n = { pending: 0, approved: 0, rejected: 0 };
+    rows.forEach(function (r) { n[statusOf(r)]++; });
+    return '<div class="stats">' +
+      stat("Approved", n.approved, "Confirmed and emailed", "award", true) +
+      stat("Pending approval", n.pending, "Waiting for your review", "layers") +
+      stat("Rejected", n.rejected, "Not confirmed", "users") + "</div>";
+  }
   function setArchived(ev, ref, archived) {
     if (PREVIEW) {
       var rows = previewLoad(ev).map(function (r) { if (r.ref === ref) r.archived = archived; return r; });
@@ -169,7 +177,7 @@
   function dashboard(ev) {
     var view = shell(ev, "dashboard"), rows = active(cache[ev] || []), total = rows.length, html;
     var title = TITLES[ev];
-    html = head(title, "Dashboard", ev);
+    html = head(title, "Dashboard", ev) + approvalStats(rows);
     if (ev !== "training") {
       html += '<div class="stats">' +
         stat("Total registrations", total, "Current registrations · archived records excluded", "users") +
@@ -265,7 +273,7 @@
     var rows = [["Reference", r.ref], ["Status", statusText(r)], ["Registered", fmtDate(r.timestamp, true)]].concat(r.updated_at ? [["Last updated", fmtDate(r.updated_at, true)]] : []).concat(Object.keys(labels).map(function (k) { return [labels[k], r[k]]; }));
     panel.innerHTML = '<button class="close-x" aria-label="Close" id="dr-close">×</button><h2 id="dr-title">' + esc(r.full_name) + '</h2><p class="page-sub">' + esc(r.organisation || "") + "</p>" +
       "<dl>" + rows.map(function (x) { return "<div><dt>" + esc(x[0]) + "</dt><dd>" + esc(x[1] || "–") + "</dd></div>"; }).join("") + "</dl>" +
-      (statusOf(r) !== "approved" ? '<div class="drawer-actions" id="approval"><button class="btn btn-primary" id="dr-approve">Approve</button>' + (statusOf(r) === "pending" ? '<button class="btn btn-danger" id="dr-reject">Reject</button></div><label class="check-inline" style="margin-top:8px"><input type="checkbox" id="dr-notify"> Email them if rejected</label>' : "</div>") : "") +
+      '<div class="drawer-actions" id="approval"><button class="btn btn-primary" id="dr-approve">Approve</button><button class="btn btn-danger" id="dr-reject">Reject</button></div><label class="check-inline" style="margin-top:8px"><input type="checkbox" id="dr-notify"> Email them if rejected</label>' +
       '<div class="drawer-actions"><a class="btn btn-line" href="mailto:' + esc(r.email) + '">Email</a>' + (r.phone ? '<a class="btn btn-line" href="https://wa.me/' + esc(String(r.phone).replace(/\D/g, "")) + '" target="_blank" rel="noopener">WhatsApp</a>' : "") +
       '<button class="btn ' + (r.archived ? "btn-primary" : "btn-line") + '" id="dr-arch">' + (r.archived ? "Restore registration" : "Archive registration") + "</button></div>" +
       '<p class="caption" style="margin-top:14px">Archived registrations are hidden from counts and exports but never deleted.</p>' +
