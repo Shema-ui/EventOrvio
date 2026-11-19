@@ -27,7 +27,7 @@
   // come from the training list above (without RCOT, which has its own line here).
   var FORUM_CATEGORIES = ["Speaker / Panelist", "Rwanda Chamber of Tourism"]
     .concat(ASSOCIATIONS.filter(function (a) { return a.indexOf("Rwanda Chamber of Tourism") !== 0; }))
-    .concat(["Member of ICT Chamber", "Delegate", "Development Partner", "Media", "Government / Public Institution", "RCOT Secretariat"]);
+    .concat(["Member of ICT Chamber", "Delegate", "Development Partner", "Media", "Government / Public Institution"]);
 
   // Gala dinner form: the same fields as the main forum form, with its own categories.
   var GALA_CATEGORIES = [
@@ -39,7 +39,6 @@
     "Rwanda Association of Professional Conference Organisers",
     "Rwanda Community Based Tourism Association",
     "Rwanda Hospitality and Tourism Educators Association",
-    "RCOT Secretariat",
     "Member of the ICT Chamber",
     "GoR Institution / Public Institution",
     "Delegate",
