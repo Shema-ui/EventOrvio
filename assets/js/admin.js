@@ -61,6 +61,20 @@
       cache[ev] = res.rows || []; return cache[ev];
     });
   }
+  function statusOf(r) { return r.status === "pending" || r.status === "rejected" ? r.status : "approved"; }
+  function statusText(r) { return { pending: "Pending approval", approved: "Approved", rejected: "Rejected" }[statusOf(r)]; }
+  function statusPill(r) { return '<span class="pill">' + esc(statusText(r)) + "</span>"; }
+  function statusSelect() {
+    var opts = [["", "All statuses"], ["pending", "Pending approval"], ["approved", "Approved"], ["rejected", "Rejected"]];
+    return '<select id="stat" aria-label="Approval status">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === tableState.status ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select>";
+  }
+  function setStatus(ev, refs, decision, notify) {
+    if (PREVIEW) {
+      var rows = previewLoad(ev).map(function (r) { if (refs.indexOf(r.ref) >= 0) r.status = decision; return r; });
+      previewStore(ev, rows); return Promise.resolve();
+    }
+    return apiPost({ action: "review", key: getKey(), event: ev, refs: refs, decision: decision, notify: !!notify }).then(function (res) { if (!res.ok) throw new Error(res.error); });
+  }
   function setArchived(ev, ref, archived) {
     if (PREVIEW) {
       var rows = previewLoad(ev).map(function (r) { if (r.ref === ref) r.archived = archived; return r; });
@@ -179,7 +193,7 @@
   }
 
   /* ---------- registrations table ---------- */
-  var tableState = { q: "", archived: false, filter: "" };
+  var tableState = { q: "", archived: false, filter: "", status: "" };
   function registrations(ev) {
     var view = shell(ev, "registrations");
     var title = TITLES[ev];
@@ -188,23 +202,26 @@
     view.innerHTML = head(title, "Registrations", ev) +
       '<div class="toolbar"><label class="search">' + ic("search") + '<span class="visually-hidden">Search</span><input id="q" type="search" placeholder="Search name, email, organisation, reference…" value="' + esc(tableState.q) + '"></label>' +
       '<select id="flt" aria-label="Filter"><option value="">All ' + (ev !== "training" ? "categories" : "associations") + "</option>" + filterOpts.map(function (o) { return "<option" + (o === tableState.filter ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>" +
+      statusSelect() + '<button class="btn btn-primary" id="approve-all">Approve all pending</button>' +
       '<label class="check-inline"><input type="checkbox" id="arch"' + (tableState.archived ? " checked" : "") + "> Show archived</label>" +
       '<button class="btn btn-line" id="csv">' + ic("download") + "CSV</button>" +
       '<button class="btn btn-primary" id="xlsx">' + ic("download") + "Excel</button>" +
       (ev === "training" ? '<button class="btn btn-line" id="certs">' + ic("award") + "Certificate names</button>" : "") +
       '</div><div id="tbl"></div>';
     var q = view.querySelector("#q"), flt = view.querySelector("#flt"), arch = view.querySelector("#arch");
+    var stat = view.querySelector("#stat"), approveAll = view.querySelector("#approve-all");
     function draw() {
       var rows = (cache[ev] || []).slice().reverse().filter(function (r) {
         if (!tableState.archived && r.archived) return false;
         if (tableState.filter && (r[filterKey] || "Not specified") !== tableState.filter) return false;
+        if (tableState.status && statusOf(r) !== tableState.status) return false;
         if (!tableState.q) return true;
         var hay = [r.ref, r.full_name, r.email, r.organisation, r.phone, r.category, r.association, r.certificate_name].join(" ").toLowerCase();
         return hay.indexOf(tableState.q.toLowerCase()) >= 0;
       });
       var cols = ev !== "training"
-        ? [["Ref", "ref"], ["Name", "full_name"], ["Organisation", "organisation"], ["Category", "category"], ["Country", "country"], ["Phone", "phone"], ["Registered", "timestamp"]]
-        : [["Ref", "ref"], ["Name", "full_name"], ["Organisation", "organisation"], ["Association", "association"], ["Certificate name", "certificate_name"], ["Phone", "phone"], ["Registered", "timestamp"]];
+        ? [["Ref", "ref"], ["Status", "status"], ["Name", "full_name"], ["Organisation", "organisation"], ["Category", "category"], ["Country", "country"], ["Phone", "phone"], ["Registered", "timestamp"]]
+        : [["Ref", "ref"], ["Status", "status"], ["Name", "full_name"], ["Organisation", "organisation"], ["Association", "association"], ["Certificate name", "certificate_name"], ["Phone", "phone"], ["Registered", "timestamp"]];
       var html = '<div class="table-wrap"><table><thead><tr>' + cols.map(function (c) { return '<th scope="col">' + c[0] + "</th>"; }).join("") + "</tr></thead><tbody>";
       if (!rows.length) html += '<tr><td colspan="' + cols.length + '" class="empty">No registrations match.</td></tr>';
       rows.forEach(function (r) {
@@ -213,6 +230,7 @@
           if (c[1] === "ref") return '<td><span class="ref">' + esc(v) + "</span></td>";
           if (c[1] === "full_name") return "<td><strong>" + esc(v) + '</strong><span class="sub">' + esc(r.email) + "</span></td>";
           if (c[1] === "timestamp") return "<td>" + esc(fmtDate(v, true)) + "</td>";
+          if (c[1] === "status") return "<td>" + statusPill(r) + "</td>";
           if (c[1] === "category") return '<td><span class="pill">' + esc(v) + "</span></td>";
           return "<td>" + esc(v) + "</td>";
         }).join("") + "</tr>";
@@ -222,6 +240,14 @@
     }
     q.addEventListener("input", function () { tableState.q = q.value; draw(); });
     flt.addEventListener("change", function () { tableState.filter = flt.value; draw(); });
+    stat.addEventListener("change", function () { tableState.status = stat.value; draw(); });
+    approveAll.addEventListener("click", function () {
+      var refs = (cache[ev] || []).filter(function (r) { return !r.archived && statusOf(r) === "pending"; }).map(function (r) { return r.ref; });
+      if (!refs.length) { alert("No pending registrations to approve."); return; }
+      if (!window.confirm("Approve " + refs.length + " registration" + (refs.length === 1 ? "" : "s") + "? Each person will get their confirmation email.")) return;
+      setStatus(ev, refs, "approved", false).then(function () { return load(ev); }).then(function () { route(); })
+        .catch(function () { alert("Could not approve. Try again."); });
+    });
     arch.addEventListener("change", function () { tableState.archived = arch.checked; draw(); });
     view.querySelector("#tbl").addEventListener("click", function (e) { var tr = e.target.closest("tr[data-ref]"); if (tr) openDetail(ev, tr.getAttribute("data-ref")); });
     view.querySelector("#tbl").addEventListener("keydown", function (e) { var tr = e.target.closest("tr[data-ref]"); if (tr && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openDetail(ev, tr.getAttribute("data-ref")); } });
@@ -236,9 +262,10 @@
   function openDetail(ev, ref) {
     var r = (cache[ev] || []).filter(function (x) { return x.ref === ref; })[0]; if (!r) return;
     var labels = labelsFor(ev), drawer = document.getElementById("drawer"), panel = document.getElementById("drawer-panel");
-    var rows = [["Reference", r.ref], ["Registered", fmtDate(r.timestamp, true)]].concat(r.updated_at ? [["Last updated", fmtDate(r.updated_at, true)]] : []).concat(Object.keys(labels).map(function (k) { return [labels[k], r[k]]; }));
+    var rows = [["Reference", r.ref], ["Status", statusText(r)], ["Registered", fmtDate(r.timestamp, true)]].concat(r.updated_at ? [["Last updated", fmtDate(r.updated_at, true)]] : []).concat(Object.keys(labels).map(function (k) { return [labels[k], r[k]]; }));
     panel.innerHTML = '<button class="close-x" aria-label="Close" id="dr-close">×</button><h2 id="dr-title">' + esc(r.full_name) + '</h2><p class="page-sub">' + esc(r.organisation || "") + "</p>" +
       "<dl>" + rows.map(function (x) { return "<div><dt>" + esc(x[0]) + "</dt><dd>" + esc(x[1] || "–") + "</dd></div>"; }).join("") + "</dl>" +
+      (statusOf(r) !== "approved" ? '<div class="drawer-actions" id="approval"><button class="btn btn-primary" id="dr-approve">Approve</button>' + (statusOf(r) === "pending" ? '<button class="btn btn-danger" id="dr-reject">Reject</button></div><label class="check-inline" style="margin-top:8px"><input type="checkbox" id="dr-notify"> Email them if rejected</label>' : "</div>") : "") +
       '<div class="drawer-actions"><a class="btn btn-line" href="mailto:' + esc(r.email) + '">Email</a>' + (r.phone ? '<a class="btn btn-line" href="https://wa.me/' + esc(String(r.phone).replace(/\D/g, "")) + '" target="_blank" rel="noopener">WhatsApp</a>' : "") +
       '<button class="btn ' + (r.archived ? "btn-primary" : "btn-line") + '" id="dr-arch">' + (r.archived ? "Restore registration" : "Archive registration") + "</button></div>" +
       '<p class="caption" style="margin-top:14px">Archived registrations are hidden from counts and exports but never deleted.</p>' +
@@ -262,6 +289,17 @@
           .catch(function () { b.disabled = false; b.textContent = "Couldn't delete. Try again"; });
       });
     });
+    var approveBtn = panel.querySelector("#dr-approve");
+    if (approveBtn) {
+      var rejectBtn = panel.querySelector("#dr-reject");
+      var decide = function (decision, notify) {
+        approveBtn.disabled = true; if (rejectBtn) rejectBtn.disabled = true;
+        setStatus(ev, [r.ref], decision, notify).then(function () { return load(ev); }).then(function () { close(); route(); })
+          .catch(function () { alert("Could not save. Try again."); approveBtn.disabled = false; if (rejectBtn) rejectBtn.disabled = false; });
+      };
+      approveBtn.addEventListener("click", function () { decide("approved", false); });
+      if (rejectBtn) rejectBtn.addEventListener("click", function () { decide("rejected", panel.querySelector("#dr-notify").checked); });
+    }
     panel.querySelector("#dr-arch").addEventListener("click", function () {
       var b = this; b.disabled = true;
       setArchived(ev, r.ref, !r.archived).then(function () { return load(ev); }).then(function () { close(); route(); })
