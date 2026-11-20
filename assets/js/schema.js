@@ -39,8 +39,8 @@
     "Rwanda Association of Professional Conference Organisers",
     "Rwanda Community Based Tourism Association",
     "Rwanda Hospitality and Tourism Educators Association",
-    "Member of the ICT Chamber",
-    "GoR Institution / Public Institution",
+    "Members of the ICT Chamber",
+    "Public institutions",
     "Delegate",
     "Exhibitor",
   ];
